@@ -20,15 +20,18 @@ export type SubscriptionPage = {
   backgroundColor: string
   currency: string
   checkoutUrl: string
+  walletAddress: string
   tiers: Tier[]
 }
 
 export const PAGE_QUERY_KEY = ['subscription-page', 'active']
+export const PAGES_QUERY_KEY = ['subscription-pages']
 
 const STORAGE_KEY = 'tierflow.subscriptionPage'
+const PAGES_STORAGE_KEY = 'tierflow.subscriptionPages'
 
 export const defaultSubscriptionPage: SubscriptionPage = {
-  slug: 'acme-growth',
+  slug: 'acme-analytics',
   businessName: 'Acme Analytics',
   headline: 'Simple plans for teams that need sharper revenue reporting.',
   subheadline:
@@ -37,6 +40,7 @@ export const defaultSubscriptionPage: SubscriptionPage = {
   backgroundColor: '#ffffff',
   currency: '$',
   checkoutUrl: 'https://pay.example.com/checkout',
+  walletAddress: '',
   tiers: [
     {
       id: 'starter',
@@ -92,30 +96,98 @@ export function createEmptyTier(): Tier {
   }
 }
 
-export async function getSubscriptionPage(): Promise<SubscriptionPage> {
+export function createSlugFromBusinessName(businessName: string) {
+  return (
+    businessName
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || defaultSubscriptionPage.slug
+  )
+}
+
+function normalizeSubscriptionPage(page: SubscriptionPage): SubscriptionPage {
+  return {
+    ...page,
+    slug: createSlugFromBusinessName(page.businessName),
+  }
+}
+
+function readStoredPages() {
   if (typeof window === 'undefined') {
-    return defaultSubscriptionPage
+    return [defaultSubscriptionPage]
+  }
+
+  const savedPages = window.localStorage.getItem(PAGES_STORAGE_KEY)
+
+  if (savedPages) {
+    try {
+      const pages = JSON.parse(savedPages)
+
+      if (Array.isArray(pages) && pages.length > 0) {
+        return pages.map((page) =>
+          normalizeSubscriptionPage({ ...defaultSubscriptionPage, ...page }),
+        )
+      }
+    } catch {
+      return [defaultSubscriptionPage]
+    }
   }
 
   const savedPage = window.localStorage.getItem(STORAGE_KEY)
 
   if (!savedPage) {
-    return defaultSubscriptionPage
+    return [defaultSubscriptionPage]
   }
 
   try {
-    return { ...defaultSubscriptionPage, ...JSON.parse(savedPage) }
+    const migratedPage = normalizeSubscriptionPage({
+      ...defaultSubscriptionPage,
+      ...JSON.parse(savedPage),
+    })
+
+    window.localStorage.setItem(PAGES_STORAGE_KEY, JSON.stringify([migratedPage]))
+
+    return [migratedPage]
   } catch {
-    return defaultSubscriptionPage
+    return [defaultSubscriptionPage]
   }
 }
 
-export async function saveSubscriptionPage(page: SubscriptionPage) {
-  if (typeof window !== 'undefined') {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(page))
+export async function listSubscriptionPages(): Promise<SubscriptionPage[]> {
+  return readStoredPages()
+}
+
+export async function getSubscriptionPage(
+  slug?: string,
+): Promise<SubscriptionPage> {
+  const pages = readStoredPages()
+
+  if (!slug) {
+    return pages[0] ?? defaultSubscriptionPage
   }
 
-  return page
+  return pages.find((page) => page.slug === slug) ?? defaultSubscriptionPage
+}
+
+export async function findSubscriptionPage(slug: string) {
+  const pages = readStoredPages()
+
+  return pages.find((page) => page.slug === slug)
+}
+
+export async function saveSubscriptionPage(page: SubscriptionPage) {
+  const nextPage = normalizeSubscriptionPage(page)
+  const pages = readStoredPages()
+  const nextPages = pages.some((item) => item.slug === nextPage.slug)
+    ? pages.map((item) => (item.slug === nextPage.slug ? nextPage : item))
+    : [...pages, nextPage]
+
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(PAGES_STORAGE_KEY, JSON.stringify(nextPages))
+  }
+
+  return nextPage
 }
 
 export function getPublicPagePath(slug: string) {

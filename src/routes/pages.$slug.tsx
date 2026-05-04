@@ -1,24 +1,35 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { createFileRoute, notFound } from '@tanstack/react-router'
 import { CheckCircle2, LockKeyhole } from 'lucide-react'
-import {
-  PAGE_QUERY_KEY,
-  defaultSubscriptionPage,
-  getSubscriptionPage,
-} from '../lib/subscriptionPage'
+import { findSubscriptionPage } from '../lib/subscriptionPage'
 import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/pages/$slug')({
+  loader: async ({ params }) => {
+    const page = await findSubscriptionPage(params.slug)
+
+    if (!page) {
+      throw notFound()
+    }
+
+    return page
+  },
   component: PublicPricingPage,
 })
 
 function PublicPricingPage() {
   const { slug } = Route.useParams()
-  const { data: page = defaultSubscriptionPage } = useQuery({
-    queryKey: PAGE_QUERY_KEY,
-    queryFn: getSubscriptionPage,
-    initialData: defaultSubscriptionPage,
-  })
+  const page = Route.useLoaderData()
+  const createCheckoutHref = (tierId: string) => {
+    const params = new URLSearchParams({ plan: tierId })
+
+    if (page.walletAddress.trim()) {
+      params.set('walletAddress', page.walletAddress.trim())
+    }
+
+    const separator = page.checkoutUrl.includes('?') ? '&' : '?'
+
+    return `${page.checkoutUrl}${separator}${params.toString()}`
+  }
 
   return (
     <main
@@ -86,7 +97,7 @@ function PublicPricingPage() {
                 style={{ backgroundColor: page.accentColor }}
               >
                 <a
-                  href={`${page.checkoutUrl}?plan=${encodeURIComponent(tier.id)}`}
+                  href={createCheckoutHref(tier.id)}
                   className="no-underline"
                 >
                   {tier.cta}

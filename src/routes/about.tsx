@@ -37,10 +37,10 @@ function About() {
     <main className="page-wrap px-4 py-10">
       <section className="mb-6">
         <p className="island-kicker mb-2">Product</p>
-        <h1 className="mb-3 max-w-3xl text-3xl font-bold tracking-tight text-[var(--sea-ink)] sm:text-5xl">
+        <h1 className="mb-3 max-w-3xl text-3xl font-bold tracking-tight text-(--sea-ink) sm:text-5xl">
           A control plane for business-owned subscription pages.
         </h1>
-        <p className="m-0 max-w-3xl text-base leading-7 text-[var(--sea-ink-soft)]">
+        <p className="m-0 max-w-3xl text-base leading-7 text-(--sea-ink-soft)">
           TierFlow is set up as a practical starter for creating, customizing,
           previewing, and publishing payment tier pages that other apps can link
           to from their pricing experience.
@@ -56,12 +56,12 @@ function About() {
             <item.icon
               size={22}
               aria-hidden="true"
-              className="mb-4 text-[var(--accent)]"
+              className="mb-4 text-(--accent)"
             />
-            <h2 className="m-0 text-lg font-bold text-[var(--sea-ink)]">
+            <h2 className="m-0 text-lg font-bold text-(--sea-ink)">
               {item.title}
             </h2>
-            <p className="mb-0 mt-2 text-sm leading-6 text-[var(--sea-ink-soft)]">
+            <p className="mb-0 mt-2 text-sm leading-6 text-(--sea-ink-soft)">
               {item.description}
             </p>
           </article>

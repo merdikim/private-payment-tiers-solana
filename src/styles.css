@@ -44,14 +44,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
+a:not([data-slot="button"]) {
   color: #000000;
   text-decoration-color: #000000;
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
 }
 
-a:hover {
+a:not([data-slot="button"]):hover {
   color: #171717;
 }
 
@@ -161,6 +161,43 @@ select {
 
 .field-input:focus {
   border-color: #000000;
+  box-shadow: 0 0 0 3px #d4d4d4;
+}
+
+.tier-card-input {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  background: transparent;
+  padding: 0.35rem 0.45rem;
+  outline: none;
+}
+
+.tier-card-input:hover {
+  border-color: #d4d4d4;
+  background: #fafafa;
+}
+
+.tier-card-input:focus {
+  border-color: #000000;
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 0 0 3px #d4d4d4;
+}
+
+.tier-card-cta {
+  width: 100%;
+  min-height: 2.7rem;
+  border: 1px solid #000000;
+  border-radius: 0.45rem;
+  color: #ffffff;
+  padding: 0.65rem 0.85rem;
+  text-align: center;
+  font-weight: 800;
+  outline: none;
+}
+
+.tier-card-cta:focus {
   box-shadow: 0 0 0 3px #d4d4d4;
 }
 
