@@ -102,6 +102,34 @@ export function normalizeSubscriptionPage(page: SubscriptionPage): SubscriptionP
     ...page,
     slug: createSlugFromBusinessName(page.businessName),
     currency: '$',
+    tiers: page.tiers.map((tier) => ({
+      ...tier,
+      features: tier.features.map((feature) => feature.trim()).filter(Boolean),
+    })),
+  }
+}
+
+export function getIncompleteTierNumbers(page: SubscriptionPage) {
+  return page.tiers.flatMap((tier, index) => {
+    const hasFeatures = tier.features.some((feature) => feature.trim())
+    const isComplete =
+      tier.name.trim() &&
+      tier.description.trim() &&
+      tier.cta.trim() &&
+      tier.price > 0 &&
+      hasFeatures
+
+    return isComplete ? [] : [index + 1]
+  })
+}
+
+export function assertSubscriptionPageCanBeSaved(page: SubscriptionPage) {
+  const incompleteTierNumbers = getIncompleteTierNumbers(page)
+
+  if (incompleteTierNumbers.length > 0) {
+    throw new Error(
+      `Fill out tier ${incompleteTierNumbers.join(', ')} before publishing.`,
+    )
   }
 }
 
@@ -138,6 +166,8 @@ export const findSubscriptionPage = createServerFn({ method: 'GET' })
 export const saveSubscriptionPage = createServerFn({ method: 'POST' })
   .inputValidator((data: SubscriptionPage) => data)
   .handler(async ({ data }) => {
+    assertSubscriptionPageCanBeSaved(data)
+
     const { saveSubscriptionPageToDatabase } = await import(
       './subscriptionPage.server'
     )

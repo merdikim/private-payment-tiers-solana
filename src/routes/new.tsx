@@ -17,6 +17,7 @@ import {
   type Tier,
   createSlugFromBusinessName,
   draftSubscriptionPage,
+  getIncompleteTierNumbers,
   saveSubscriptionPage,
 } from '../lib/subscriptionPage'
 
@@ -98,6 +99,10 @@ function NewCheckoutPage() {
     onSuccess: async (nextPage) => {
       queryClient.setQueryData(PAGE_QUERY_KEY, nextPage)
       await queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY })
+      toast({
+        title: 'Checkout page created',
+        description: `${nextPage.businessName} is now saved to your dashboard.`,
+      })
       await navigate({ to: '/dashboard' })
     },
     onError: (error) => {
@@ -128,7 +133,20 @@ function NewCheckoutPage() {
       return
     }
 
-    savePage.mutate(withSingleRecommendedTier(page))
+    const nextPage = withSingleRecommendedTier(page)
+    const incompleteTierNumbers = getIncompleteTierNumbers(nextPage)
+
+    if (incompleteTierNumbers.length > 0) {
+      toast({
+        title: 'Tier details missing',
+        description: `Fill out tier ${incompleteTierNumbers.join(
+          ', ',
+        )}: name, description, price, button text, and at least one feature.`,
+      })
+      return
+    }
+
+    savePage.mutate(nextPage)
   }
 
   return (

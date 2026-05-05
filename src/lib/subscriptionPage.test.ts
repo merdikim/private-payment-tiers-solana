@@ -3,6 +3,7 @@ import {
   createEmptyTier,
   createSlugFromBusinessName,
   draftSubscriptionPage,
+  getIncompleteTierNumbers,
   getPublicPagePath,
   normalizeSubscriptionPage,
 } from './subscriptionPage'
@@ -37,5 +38,25 @@ describe('subscription page helpers', () => {
       slug: 'kim-co-billing',
       currency: '$',
     })
+  })
+
+  it('reports tiers missing required content', () => {
+    expect(getIncompleteTierNumbers(draftSubscriptionPage)).toEqual([1, 2, 3])
+
+    expect(
+      getIncompleteTierNumbers({
+        ...draftSubscriptionPage,
+        tiers: [
+          {
+            ...draftSubscriptionPage.tiers[0],
+            name: 'Launch',
+            description: 'For getting started.',
+            price: 29,
+            cta: 'Choose Launch',
+            features: ['Core access'],
+          },
+        ],
+      }),
+    ).toEqual([])
   })
 })

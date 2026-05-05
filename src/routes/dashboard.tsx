@@ -1,7 +1,14 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useServerFn } from '@tanstack/react-start'
-import { Copy, ExternalLink, FilePlus2, Link as LinkIcon, Plus } from 'lucide-react'
+import {
+  Copy,
+  ExternalLink,
+  FilePlus2,
+  Link as LinkIcon,
+  LoaderCircle,
+  Plus,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   PAGES_QUERY_KEY,
@@ -13,10 +20,9 @@ export const Route = createFileRoute('/dashboard')({ component: Dashboard })
 
 function Dashboard() {
   const listSubscriptionPagesFn = useServerFn(listSubscriptionPages)
-  const { data: pages = [] } = useQuery({
+  const { data: pages = [], isPending } = useQuery({
     queryKey: PAGES_QUERY_KEY,
     queryFn: () => listSubscriptionPagesFn(),
-    initialData: [],
   })
 
   const origin =
@@ -45,7 +51,9 @@ function Dashboard() {
         </Button>
       </section>
 
-      {activePages.length === 0 ? (
+      {isPending ? (
+        <DashboardLoading />
+      ) : activePages.length === 0 ? (
         <section className="island-shell grid min-h-90 place-items-center rounded-lg p-6 text-center">
           <div className="mx-auto max-w-md">
             <FilePlus2
@@ -149,6 +157,58 @@ function Dashboard() {
         </section>
       )}
     </main>
+  )
+}
+
+function DashboardLoading() {
+  return (
+    <section className="island-shell rounded-lg p-4 sm:p-6">
+      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <div className="mb-3 h-3 w-24 rounded-full bg-(--surface-muted)" />
+          <h1 className="m-0 flex items-center gap-3 text-2xl font-black text-(--sea-ink)">
+            <LoaderCircle size={22} aria-hidden="true" className="animate-spin" />
+            Loading dashboard
+          </h1>
+          <p className="m-0 mt-2 max-w-md text-sm leading-6 text-(--sea-ink-soft)">
+            Pulling your checkout pages from the database.
+          </p>
+        </div>
+
+        <div className="h-10 w-full rounded-md border border-black bg-(--surface-muted) sm:w-40" />
+      </div>
+
+      <div className="grid gap-4">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div
+            key={index}
+            className="grid gap-4 rounded-lg border border-(--line) bg-white p-4 lg:grid-cols-[1fr_300px]"
+          >
+            <div>
+              <div className="mb-4 flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full border border-black bg-(--surface-muted)" />
+                <div className="h-5 w-44 rounded-md bg-(--surface-muted)" />
+                <div className="h-6 w-16 rounded-md border border-black bg-white" />
+              </div>
+              <div className="mb-2 h-3 w-full max-w-lg rounded-full bg-(--surface-muted)" />
+              <div className="h-3 w-2/3 rounded-full bg-(--surface-muted)" />
+              <div className="mt-5 h-11 rounded-md border border-(--line) bg-(--surface-muted)" />
+            </div>
+
+            <div className="grid gap-3 rounded-md border border-black bg-white p-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="h-16 rounded-md border border-(--line) bg-(--surface-muted)" />
+                <div className="h-16 rounded-md border border-(--line) bg-(--surface-muted)" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="h-10 rounded-md border border-black bg-white" />
+                <div className="h-10 rounded-md border border-black bg-white" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
