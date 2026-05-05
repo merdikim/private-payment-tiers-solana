@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useServerFn } from '@tanstack/react-start'
+import type { ReactNode } from 'react'
 import {
   Copy,
   ExternalLink,
@@ -8,6 +9,7 @@ import {
   Link as LinkIcon,
   LoaderCircle,
   Plus,
+  Wallet,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,6 +19,9 @@ import {
 } from '../lib/subscriptionPage'
 
 export const Route = createFileRoute('/dashboard')({ component: Dashboard })
+
+const noteColors = ['#fff7ad', '#dcfce7', '#dbeafe', '#ffe4e6', '#fef3c7']
+const noteRotations = ['-1.2deg', '0.8deg', '-0.5deg', '1.1deg']
 
 function Dashboard() {
   const listSubscriptionPagesFn = useServerFn(listSubscriptionPages)
@@ -77,86 +82,151 @@ function Dashboard() {
           </div>
         </section>
       ) : (
-        <section className="grid gap-4">
-          {activePages.map((page) => {
+        <section className="min-h-[calc(100vh-330px)] rounded-lg border border-black bg-[#f4f1e8] p-4 shadow-[6px_6px_0_#000]">
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          {activePages.map((page, index) => {
             const publicPath = getPublicPagePath(page.slug)
             const publicUrl = `${origin}${publicPath}`
-            const lowestPrice = Math.min(...page.tiers.map((tier) => tier.price))
+            const noteColor = noteColors[index % noteColors.length]
+            const noteRotation = noteRotations[index % noteRotations.length]
 
             return (
               <article
                 key={page.slug}
-                className="island-shell grid gap-4 rounded-lg p-4 lg:grid-cols-[1fr_300px]"
+                className="windy-note relative flex flex-col rounded-sm border border-black p-3 shadow-[4px_4px_0_rgba(0,0,0,0.22)]"
+                style={{
+                  backgroundColor: noteColor,
+                  ['--note-rotation' as string]: noteRotation,
+                  ['--note-delay' as string]: `${index * -0.8}s`,
+                }}
               >
-                <div className="min-w-0">
-                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className="absolute left-1/2 top-0 h-5 w-20 -translate-x-1/2 -translate-y-2 rotate-1 border border-black bg-white/70"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h2 className="m-0 truncate text-base font-black text-(--sea-ink)">
+                        {page.businessName}
+                      </h2>
+                      <p className="m-0 mt-0.5 text-[11px] font-bold uppercase text-(--sea-ink-soft)">
+                        {page.tiers.length} plans
+                      </p>
+                    </div>
                     <span
-                      className="h-3 w-3 rounded-full border border-black"
+                      className="h-3.5 w-3.5 shrink-0 rounded-full border border-black"
                       style={{ backgroundColor: page.accentColor }}
                     />
-                    <h2 className="m-0 text-xl font-black text-(--sea-ink)">
-                      {page.businessName}
-                    </h2>
-                    <span className="rounded-md border border-black px-2 py-1 text-xs font-bold">
-                      {page.tiers.length} plans
-                    </span>
                   </div>
 
-                  <p className="m-0 max-w-3xl text-sm leading-6 text-(--sea-ink-soft)">
+                  <p className="m-0 line-clamp-1 text-xs leading-5 text-(--sea-ink-soft)">
                     {page.headline}
                   </p>
 
-                  <div className="mt-4 flex min-h-11 items-center gap-2 rounded-md border border-(--line) bg-(--surface-muted) px-3 text-sm text-(--sea-ink-soft)">
-                    <LinkIcon size={16} aria-hidden="true" className="shrink-0" />
-                    <span className="min-w-0 flex-1 truncate">{publicUrl}</span>
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="outline"
-                      className="h-8 w-8"
-                      title="Copy public URL"
-                      onClick={() => void navigator.clipboard?.writeText(publicUrl)}
+                  <div className="mt-3">
+                    <p className="m-0 mb-1.5 text-[11px] font-bold uppercase text-(--sea-ink-soft)">
+                      Tier pricing
+                    </p>
+                    <div className="divide-y divide-neutral-300 rounded-md border border-(--line) bg-white/60">
+                      {page.tiers.map((tier) => (
+                        <div
+                          key={tier.id}
+                          className="flex min-h-8 items-center justify-between gap-2 px-2.5 py-1.5 text-xs"
+                        >
+                          <span className="min-w-0 truncate font-semibold text-(--sea-ink)">
+                            {tier.name}
+                          </span>
+                          <span className="shrink-0 font-bold text-(--sea-ink)">
+                            {page.currency}
+                            {tier.price}
+                            <span className="font-semibold text-(--sea-ink-soft)">
+                              /{tier.cycle}
+                            </span>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <CopyRow
+                    className="mt-3 bg-white/60"
+                    icon={<LinkIcon size={16} aria-hidden="true" />}
+                    label="Public page"
+                    value={publicUrl}
+                    title="Copy public URL"
+                  />
+                  <CopyRow
+                    className="mt-2 bg-white/60"
+                    icon={<Wallet size={16} aria-hidden="true" />}
+                    label="Payment address"
+                    value={page.walletAddress}
+                    title="Copy payment address"
+                  />
+                </div>
+
+                {/* <div className="mt-3 grid grid-cols-2 gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link
+                      to="/pages/$slug"
+                      params={{ slug: page.slug }}
+                      className="no-underline"
                     >
-                      <Copy size={15} aria-hidden="true" />
-                      <span className="sr-only">Copy public URL</span>
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="grid content-between gap-3 rounded-md border border-black bg-white p-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <Metric label="Lowest" value={`${page.currency}${lowestPrice}`} />
-                    <Metric
-                      label="Featured"
-                      value={page.tiers.filter((tier) => tier.featured).length}
-                    />
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Button asChild variant="outline" className="flex-1">
-                      <Link
-                        to="/pages/$slug"
-                        params={{ slug: page.slug }}
-                        className="no-underline"
-                      >
-                        <ExternalLink size={15} aria-hidden="true" />
-                        Page
-                      </Link>
-                    </Button>
-                    <Button asChild variant="outline" className="flex-1">
-                      <a href={page.checkoutUrl} className="no-underline">
-                        <ExternalLink size={15} aria-hidden="true" />
-                        Checkout
-                      </a>
-                    </Button>
-                  </div>
-                </div>
+                      <ExternalLink size={15} aria-hidden="true" />
+                      Page
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm">
+                    <a href={page.checkoutUrl} className="no-underline">
+                      <ExternalLink size={15} aria-hidden="true" />
+                      Checkout
+                    </a>
+                  </Button>
+                </div> */}
               </article>
             )
           })}
+          </div>
         </section>
       )}
     </main>
+  )
+}
+
+function CopyRow({
+  className,
+  icon,
+  label,
+  value,
+  title,
+}: {
+  className?: string
+  icon: ReactNode
+  label: string
+  value: string
+  title: string
+}) {
+  return (
+    <div
+      className={`flex min-h-8 items-center gap-2 rounded-md border border-(--line) bg-(--surface-muted) px-2.5 text-[11px] text-(--sea-ink-soft) ${className ?? ''}`}
+    >
+      <span className="shrink-0">{icon}</span>
+      <div className="min-w-0 flex-1">
+        <span className="sr-only">{label}</span>
+        <span className="block truncate">{value}</span>
+      </div>
+      <Button
+        type="button"
+        size="icon"
+        variant="outline"
+        className="h-6 w-6"
+        title={title}
+        onClick={() => void navigator.clipboard?.writeText(value)}
+      >
+        <Copy size={13} aria-hidden="true" />
+        <span className="sr-only">{title}</span>
+      </Button>
+    </div>
   )
 }
 
@@ -209,16 +279,5 @@ function DashboardLoading() {
         ))}
       </div>
     </section>
-  )
-}
-
-function Metric({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-md border border-(--line) bg-(--surface-muted) p-3">
-      <p className="m-0 text-xs font-semibold uppercase text-(--sea-ink-soft)">
-        {label}
-      </p>
-      <p className="m-0 mt-1 text-xl font-bold text-(--sea-ink)">{value}</p>
-    </div>
   )
 }

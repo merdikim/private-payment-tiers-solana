@@ -232,6 +232,35 @@ select {
   box-shadow: none;
 }
 
+.windy-note {
+  --note-rotation: 0deg;
+  --note-delay: 0s;
+  transform-origin: 50% 8%;
+  animation: note-wind 5.8s ease-in-out infinite;
+  animation-delay: var(--note-delay);
+}
+
+.windy-note:hover {
+  animation-play-state: paused;
+  transform: rotate(0deg) translateY(-2px);
+  z-index: 2;
+}
+
+@keyframes note-wind {
+  0%,
+  100% {
+    transform: rotate(var(--note-rotation)) translateY(0);
+  }
+
+  35% {
+    transform: rotate(calc(var(--note-rotation) + 0.45deg)) translateY(-1px);
+  }
+
+  70% {
+    transform: rotate(calc(var(--note-rotation) - 0.35deg)) translateY(1px);
+  }
+}
+
 @media (max-width: 640px) {
   .nav-link::after {
     bottom: -4px;
