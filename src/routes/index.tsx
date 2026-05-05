@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { usePrivy } from '@privy-io/react-auth'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import {
   ArrowRight,
   CheckCircle2,
@@ -7,6 +8,7 @@ import {
   Layers3,
   ShieldCheck,
 } from 'lucide-react'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
@@ -36,6 +38,15 @@ const steps = [
 ]
 
 function LandingPage() {
+  const navigate = useNavigate()
+  const { authenticated, ready } = usePrivy()
+
+  useEffect(() => {
+    if (ready && authenticated) {
+      void navigate({ to: '/dashboard' })
+    }
+  }, [authenticated, navigate, ready])
+
   return (
     <main>
       <section className="page-wrap grid min-h-[calc(100vh-220px)] items-center gap-10 px-4 py-12 lg:grid-cols-[1.08fr_0.92fr]">

@@ -23,23 +23,23 @@ function Dashboard() {
   const activePages = pages.filter((page) => page.checkoutUrl && page.slug)
 
   return (
-    <main className="page-wrap px-4 py-8">
+    <main className="page-wrap min-h-[calc(100vh-230px)] px-4 py-8">
       <section className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="island-kicker mb-2">Dashboard</p>
-          <h1 className="mb-3 max-w-4xl text-3xl font-bold tracking-tight text-(--sea-ink) sm:text-5xl">
+          {/* <h1 className="mb-3 max-w-4xl text-3xl font-bold tracking-tight text-(--sea-ink) sm:text-5xl">
             Businesses with active checkout links.
           </h1>
           <p className="max-w-3xl text-base leading-7 text-(--sea-ink-soft)">
             Review each business page, copy its public pricing link, or open the
             live checkout destination.
-          </p>
+          </p> */}
         </div>
 
         <Button asChild>
           <Link to="/new" className="no-underline">
             <Plus size={16} aria-hidden="true" />
-            New checkout
+            New checkout Page
           </Link>
         </Button>
       </section>

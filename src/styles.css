@@ -173,16 +173,37 @@ select {
   outline: none;
 }
 
+.tier-card-input::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.tier-card-input-inverted::placeholder {
+  color: #a3a3a3;
+  opacity: 1;
+}
+
 .tier-card-input:hover {
-  border-color: #d4d4d4;
+  border-color: transparent;
   background: #fafafa;
 }
 
+.tier-card-input-inverted:hover {
+  border-color: transparent;
+  background: #171717;
+}
+
 .tier-card-input:focus {
-  border-color: #000000;
-  background: #ffffff;
-  color: #000000;
-  box-shadow: 0 0 0 3px #d4d4d4;
+  border-color: transparent;
+  background: #fafafa;
+  box-shadow: none;
+}
+
+.tier-card-input-inverted:focus {
+  border-color: transparent;
+  background: #171717;
+  color: #ffffff;
+  box-shadow: none;
 }
 
 .tier-card-cta {
@@ -197,8 +218,18 @@ select {
   outline: none;
 }
 
+.tier-card-cta::placeholder {
+  color: #d4d4d4;
+  opacity: 1;
+}
+
+.tier-card-cta-inverted::placeholder {
+  color: #525252;
+  opacity: 1;
+}
+
 .tier-card-cta:focus {
-  box-shadow: 0 0 0 3px #d4d4d4;
+  box-shadow: none;
 }
 
 @media (max-width: 640px) {

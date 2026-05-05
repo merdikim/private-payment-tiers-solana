@@ -1,13 +1,12 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
 import {
-  Copy,
-  Eye,
   Link as LinkIcon,
   Save,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 import {
   PAGE_QUERY_KEY,
@@ -17,13 +16,71 @@ import {
   type Tier,
   createSlugFromBusinessName,
   defaultSubscriptionPage,
-  getPublicPagePath,
   saveSubscriptionPage,
 } from '../lib/subscriptionPage'
 
 export const Route = createFileRoute('/new')({
   component: NewCheckoutPage,
 })
+
+const pagePlaceholders = {
+  businessName: 'Business name',
+  headline: 'A clear headline for your pricing page.',
+  subheadline: 'A short description of what customers get after subscribing.',
+  checkoutUrl: 'https://your-checkout-link.com',
+  walletAddress: 'Solana wallet address',
+}
+
+const tierPlaceholders = [
+  {
+    name: 'Launch',
+    description: 'For customers getting started.',
+    price: '29',
+    cta: 'Choose Launch',
+    features: 'Core access\nHosted checkout page\nEmail support',
+  },
+  {
+    name: 'Growth',
+    description: 'For teams ready to grow.',
+    price: '89',
+    cta: 'Choose Growth',
+    features: 'Everything in Launch\nMore usage\nPriority support',
+  },
+  {
+    name: 'Scale',
+    description: 'For larger businesses.',
+    price: '249',
+    cta: 'Contact Sales',
+    features: 'Custom limits\nAdvanced workflows\nDedicated onboarding',
+  },
+]
+
+const requiredPageFields = [
+  { label: 'Business name', key: 'businessName' },
+  { label: 'Wallet address', key: 'walletAddress' },
+  { label: 'Headline', key: 'headline' },
+  { label: 'Checkout URL', key: 'checkoutUrl' },
+] as const
+
+function createBlankPage(): SubscriptionPage {
+  return withSingleRecommendedTier({
+    ...defaultSubscriptionPage,
+    businessName: '',
+    slug: '',
+    headline: '',
+    subheadline: '',
+    checkoutUrl: '',
+    walletAddress: '',
+    tiers: defaultSubscriptionPage.tiers.map((tier) => ({
+      ...tier,
+      name: '',
+      description: '',
+      price: 0,
+      cta: '',
+      features: [],
+    })),
+  })
+}
 
 function withSingleRecommendedTier(page: SubscriptionPage): SubscriptionPage {
   const recommendedTierId =
@@ -41,18 +98,8 @@ function withSingleRecommendedTier(page: SubscriptionPage): SubscriptionPage {
 function NewCheckoutPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const [page, setPage] = useState<SubscriptionPage>(() => {
-    const businessName = 'New Business'
-
-    return withSingleRecommendedTier({
-      ...defaultSubscriptionPage,
-      businessName,
-      slug: createSlugFromBusinessName(businessName),
-      headline: 'Simple plans for customers ready to subscribe.',
-      subheadline:
-        'Choose a plan, complete checkout, and get access to the product.',
-    })
-  })
+  const { toast } = useToast()
+  const [page, setPage] = useState<SubscriptionPage>(() => createBlankPage())
 
   const savePage = useMutation({
     mutationFn: saveSubscriptionPage,
@@ -67,10 +114,21 @@ function NewCheckoutPage() {
     setPage((current) => recipe(current))
   }
 
-  const publicPath = getPublicPagePath(page.slug)
-  const origin =
-    typeof window === 'undefined' ? 'https://tierflow.local' : window.location.origin
-  const publicUrl = `${origin}${publicPath}`
+  const publishPage = () => {
+    const missingFields = requiredPageFields
+      .filter((field) => !page[field.key].trim())
+      .map((field) => field.label)
+
+    if (missingFields.length > 0) {
+      toast({
+        title: 'Required details missing',
+        description: `Add: ${missingFields.join(', ')}`,
+      })
+      return
+    }
+
+    savePage.mutate(withSingleRecommendedTier(page))
+  }
 
   return (
     <main className="page-wrap px-4 py-8">
@@ -86,7 +144,7 @@ function NewCheckoutPage() {
         </div>
 
         <div className="island-shell rounded-lg p-4">
-          <div className="mb-3 flex items-center justify-between gap-3">
+          {/* <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <p className="m-0 text-sm font-semibold text-(--sea-ink)">
                 Generated link
@@ -116,12 +174,12 @@ function NewCheckoutPage() {
               <Copy size={15} aria-hidden="true" />
               <span className="sr-only">Copy public URL</span>
             </Button>
-          </div>
+          </div> */}
           <Button
             type="button"
             className="mt-3 w-full"
             disabled={savePage.isPending}
-            onClick={() => savePage.mutate(withSingleRecommendedTier(page))}
+            onClick={publishPage}
           >
             <Save size={15} aria-hidden="true" />
             {savePage.isPending ? 'Publishing...' : 'Publish checkout'}
@@ -135,6 +193,8 @@ function NewCheckoutPage() {
             <Field
               label="Business name"
               value={page.businessName}
+              placeholder={pagePlaceholders.businessName}
+              required
               onChange={(businessName) =>
                 updatePage((current) => ({
                   ...current,
@@ -143,9 +203,20 @@ function NewCheckoutPage() {
                 }))
               }
             />
+            <Field
+              label="Wallet address"
+              value={page.walletAddress}
+              placeholder={pagePlaceholders.walletAddress}
+              required
+              onChange={(walletAddress) =>
+                updatePage((current) => ({ ...current, walletAddress }))
+              }
+            />
             <TextArea
               label="Headline"
               value={page.headline}
+              placeholder={pagePlaceholders.headline}
+              required
               onChange={(headline) =>
                 updatePage((current) => ({ ...current, headline }))
               }
@@ -153,31 +224,18 @@ function NewCheckoutPage() {
             <TextArea
               label="Subheadline"
               value={page.subheadline}
+              placeholder={pagePlaceholders.subheadline}
               onChange={(subheadline) =>
                 updatePage((current) => ({ ...current, subheadline }))
               }
             />
-            <div className="grid grid-cols-[90px_1fr] gap-3">
-              <Field
-                label="Currency"
-                value={page.currency}
-                onChange={(currency) =>
-                  updatePage((current) => ({ ...current, currency }))
-                }
-              />
-              <Field
-                label="Checkout URL"
-                value={page.checkoutUrl}
-                onChange={(checkoutUrl) =>
-                  updatePage((current) => ({ ...current, checkoutUrl }))
-                }
-              />
-            </div>
             <Field
-              label="Wallet address"
-              value={page.walletAddress}
-              onChange={(walletAddress) =>
-                updatePage((current) => ({ ...current, walletAddress }))
+              label="Checkout URL"
+              value={page.checkoutUrl}
+              placeholder={pagePlaceholders.checkoutUrl}
+              required
+              onChange={(checkoutUrl) =>
+                updatePage((current) => ({ ...current, checkoutUrl }))
               }
             />
           </Panel>
@@ -217,21 +275,31 @@ function Panel({
 function Field({
   label,
   value,
+  placeholder,
+  required = false,
   type = 'text',
   onChange,
 }: {
   label: string
   value: string
+  placeholder?: string
+  required?: boolean
   type?: string
   onChange: (value: string) => void
 }) {
   return (
     <label className="block">
-      <span className="field-label">{label}</span>
+      <span className="field-label">
+        {label}
+        {required ? <span aria-hidden="true"> *</span> : null}
+      </span>
       <input
         className="field-input"
         type={type}
         value={value}
+        placeholder={placeholder}
+        required={required}
+        aria-required={required}
         onChange={(event) => onChange(event.target.value)}
       />
     </label>
@@ -241,18 +309,28 @@ function Field({
 function TextArea({
   label,
   value,
+  placeholder,
+  required = false,
   onChange,
 }: {
   label: string
   value: string
+  placeholder?: string
+  required?: boolean
   onChange: (value: string) => void
 }) {
   return (
     <label className="block">
-      <span className="field-label">{label}</span>
+      <span className="field-label">
+        {label}
+        {required ? <span aria-hidden="true"> *</span> : null}
+      </span>
       <textarea
         className="field-input min-h-24 resize-y leading-6"
         value={value}
+        placeholder={placeholder}
+        required={required}
+        aria-required={required}
         onChange={(event) => onChange(event.target.value)}
       />
     </label>
@@ -288,156 +366,177 @@ function PricingPreview({
     }))
   }
 
-  return (
-    <section className="overflow-hidden rounded-lg border border-(--line) bg-white">
-      <div
-        className="border-t-5 border-black bg-white p-5"
+  const renderTierEditor = (tier: Tier, index: number) => {
+    const isRecommended = tier.id === recommendedTierId
+    const placeholders =
+      tierPlaceholders[index] ?? tierPlaceholders[tierPlaceholders.length - 1]
+
+    return (
+      <article
+        key={tier.id}
+        className={cn(
+          'rounded-lg border p-4',
+          isRecommended ? 'bg-black' : 'bg-white',
+        )}
+        style={{
+          borderColor: isRecommended ? '#000000' : 'var(--line)',
+        }}
       >
-        <p className="m-0 text-sm font-bold text-black">
-          {page.businessName}
-        </p>
-        <h2 className="mb-2 mt-2 max-w-3xl text-2xl font-bold text-slate-950">
-          {page.headline}
-        </h2>
-        <p className="m-0 max-w-3xl text-sm leading-6 text-slate-600">
-          {page.subheadline}
-        </p>
-      </div>
-      <div className="grid gap-4 p-5 lg:grid-cols-3">
-        {page.tiers.map((tier) => {
-          const isRecommended = tier.id === recommendedTierId
-
-          return (
-            <article
-              key={tier.id}
+        <div>
+          <div className="mb-3 flex min-h-8 items-center gap-3">
+            <label
               className={cn(
-                'rounded-lg border p-4',
-                isRecommended ? 'bg-black' : 'bg-white',
+                'inline-flex items-center gap-2 text-xs font-bold',
+                isRecommended ? 'text-white' : 'text-slate-700',
               )}
-              style={{
-                borderColor: isRecommended ? '#000000' : 'var(--line)',
-              }}
             >
-            <div className="mb-3 flex min-h-8 items-center gap-3">
-              <label
-                className={cn(
-                  'inline-flex items-center gap-2 text-xs font-bold',
-                  isRecommended ? 'text-white' : 'text-slate-700',
-                )}
-              >
-                <input
-                  type="radio"
-                  name="recommended-tier"
-                  checked={isRecommended}
-                  onChange={() => setRecommendedTier(tier.id)}
-                />
-                Recommended
-              </label>
-            </div>
-
-            <label className="block">
-              <span className="sr-only">Tier name</span>
               <input
+                type="radio"
+                name="recommended-tier"
+                checked={isRecommended}
+                onChange={() => setRecommendedTier(tier.id)}
+              />
+              Recommended
+            </label>
+          </div>
+
+          <label className="block">
+            <span className="sr-only">Tier name</span>
+            <input
+              className={cn(
+                'tier-card-input text-lg font-bold',
+                isRecommended ? 'text-white' : 'text-slate-950',
+                isRecommended && 'tier-card-input-inverted',
+              )}
+              value={tier.name}
+              placeholder={placeholders.name}
+              onChange={(event) => updateTier(tier.id, { name: event.target.value })}
+            />
+          </label>
+
+          <label className="mt-2 block">
+            <span className="sr-only">Tier description</span>
+            <textarea
+              className={cn(
+                'tier-card-input min-h-16 resize-y text-sm leading-6',
+                isRecommended ? 'text-neutral-200' : 'text-slate-600',
+                isRecommended && 'tier-card-input-inverted',
+              )}
+              value={tier.description}
+              placeholder={placeholders.description}
+              onChange={(event) =>
+                updateTier(tier.id, { description: event.target.value })
+              }
+            />
+          </label>
+        </div>
+
+        <div>
+          <div className="mt-3 grid grid-cols-[1fr_116px] items-end gap-2">
+            <label className="block">
+              <span className="sr-only">Tier price</span>
+              <span
                 className={cn(
-                  'tier-card-input text-lg font-bold',
+                  'flex items-center gap-1 text-3xl font-bold',
                   isRecommended ? 'text-white' : 'text-slate-950',
                 )}
-                value={tier.name}
-                onChange={(event) => updateTier(tier.id, { name: event.target.value })}
-              />
-            </label>
-
-            <label className="mt-2 block">
-              <span className="sr-only">Tier description</span>
-              <textarea
-                className={cn(
-                  'tier-card-input min-h-16 resize-y text-sm leading-6',
-                  isRecommended ? 'text-neutral-200' : 'text-slate-600',
-                )}
-                value={tier.description}
-                onChange={(event) =>
-                  updateTier(tier.id, { description: event.target.value })
-                }
-              />
-            </label>
-
-            <div className="mt-3 grid grid-cols-[1fr_116px] items-end gap-2">
-              <label className="block">
-                <span className="sr-only">Tier price</span>
-                <span
+              >
+                {page.currency}
+                <input
                   className={cn(
-                    'flex items-center gap-1 text-3xl font-bold',
+                    'tier-card-input min-w-0 text-3xl font-bold',
                     isRecommended ? 'text-white' : 'text-slate-950',
+                    isRecommended && 'tier-card-input-inverted',
                   )}
-                >
-                  {page.currency}
-                  <input
-                    className={cn(
-                      'tier-card-input min-w-0 text-3xl font-bold',
-                      isRecommended ? 'text-white' : 'text-slate-950',
-                    )}
-                    type="number"
-                    value={String(tier.price)}
-                    onChange={(event) =>
-                      updateTier(tier.id, { price: Number(event.target.value) })
-                    }
-                  />
-                </span>
-              </label>
-              <label className="block">
-                <span className="sr-only">Billing cycle</span>
-                <select
-                  value={tier.cycle}
-                  className={cn(
-                    'tier-card-input h-10 text-sm font-semibold',
-                    isRecommended ? 'text-neutral-200' : 'text-slate-500',
-                  )}
+                  type="number"
+                  value={tier.price > 0 ? String(tier.price) : ''}
+                  placeholder={placeholders.price}
                   onChange={(event) =>
-                    updateTier(tier.id, {
-                      cycle: event.target.value as BillingCycle,
-                    })
+                    updateTier(tier.id, { price: Number(event.target.value) })
                   }
-                >
-                  <option value="month">/month</option>
-                  <option value="year">/year</option>
-                </select>
-              </label>
-            </div>
-
-            <label className="mt-4 block">
-              <span className="sr-only">Button text</span>
-              <input
-                className="tier-card-cta"
-                style={{
-                  backgroundColor: isRecommended ? '#ffffff' : '#000000',
-                  color: isRecommended ? '#000000' : '#ffffff',
-                }}
-                value={tier.cta}
-                onChange={(event) => updateTier(tier.id, { cta: event.target.value })}
-              />
+                />
+              </span>
             </label>
-
-            <label className="mt-4 block">
-              <span className="sr-only">Features</span>
-              <textarea
+            <label className="block">
+              <span className="sr-only">Billing cycle</span>
+              <select
+                value={tier.cycle}
                 className={cn(
-                  'tier-card-input min-h-32 resize-y text-sm leading-7',
-                  isRecommended ? 'text-neutral-100' : 'text-slate-700',
+                  'tier-card-input h-10 text-sm font-semibold',
+                  isRecommended ? 'text-neutral-200' : 'text-slate-500',
+                  isRecommended && 'tier-card-input-inverted',
                 )}
-                value={tier.features.join('\n')}
                 onChange={(event) =>
                   updateTier(tier.id, {
-                    features: event.target.value
-                      .split('\n')
-                      .map((feature) => feature.trim())
-                      .filter(Boolean),
+                    cycle: event.target.value as BillingCycle,
                   })
                 }
-              />
+              >
+                <option value="month">/month</option>
+                <option value="year">/year</option>
+              </select>
             </label>
-          </article>
-          )
-        })}
+          </div>
+
+          <label className="mt-4 block">
+            <span className="sr-only">Button text</span>
+            <input
+              className={cn(
+                'tier-card-cta',
+                isRecommended && 'tier-card-cta-inverted',
+              )}
+              style={{
+                backgroundColor: isRecommended ? '#ffffff' : '#000000',
+                color: isRecommended ? '#000000' : '#ffffff',
+              }}
+              value={tier.cta}
+              placeholder={placeholders.cta}
+              onChange={(event) => updateTier(tier.id, { cta: event.target.value })}
+            />
+          </label>
+        </div>
+
+        <label className="mt-4 block">
+          <span className="sr-only">Features</span>
+          <textarea
+            className={cn(
+              'tier-card-input min-h-32 resize-y text-sm leading-7',
+              isRecommended ? 'text-neutral-100' : 'text-slate-700',
+              isRecommended && 'tier-card-input-inverted',
+            )}
+            value={tier.features.join('\n')}
+            placeholder={placeholders.features}
+            onChange={(event) =>
+              updateTier(tier.id, {
+                features: event.target.value
+                  .split('\n')
+                  .map((feature) => feature.trim())
+                  .filter(Boolean),
+              })
+            }
+          />
+        </label>
+      </article>
+    )
+  }
+
+  return (
+    <section className="overflow-hidden rounded-lg border border-(--line) bg-white">
+      <div className="border-t-5 border-black bg-white p-5">
+        <p className="m-0 text-sm font-bold text-black">
+          {page.businessName || pagePlaceholders.businessName}
+        </p>
+        <h2 className="mb-2 mt-2 max-w-3xl text-2xl font-bold text-slate-950">
+          {page.headline || pagePlaceholders.headline}
+        </h2>
+        <p className="m-0 max-w-3xl text-sm leading-6 text-slate-600">
+          {page.subheadline || pagePlaceholders.subheadline}
+        </p>
+      </div>
+      <div
+        className="grid gap-4 p-5 lg:grid-cols-3"
+      >
+        {page.tiers.map(renderTierEditor)}
       </div>
     </section>
   )
