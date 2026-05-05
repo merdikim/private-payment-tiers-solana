@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model SubscriptionPage {
+  slug            String   @id
+  businessName    String   @map("business_name")
+  headline        String
+  subheadline     String   @default("")
+  accentColor     String   @map("accent_color")
+  backgroundColor String   @map("background_color")
+  currency        String   @default("$")
+  checkoutUrl     String   @map("checkout_url")
+  walletAddress   String   @default("") @map("wallet_address")
+  tiers           Json
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("subscription_pages")
+}

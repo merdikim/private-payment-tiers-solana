@@ -1,3 +1,5 @@
+import { createServerFn } from '@tanstack/react-start'
+
 export type BillingCycle = 'month' | 'year'
 
 export type Tier = {
@@ -27,60 +29,50 @@ export type SubscriptionPage = {
 export const PAGE_QUERY_KEY = ['subscription-page', 'active']
 export const PAGES_QUERY_KEY = ['subscription-pages']
 
-const STORAGE_KEY = 'tierflow.subscriptionPage'
-const PAGES_STORAGE_KEY = 'tierflow.subscriptionPages'
+export const draftTiers: Tier[] = [
+  {
+    id: 'starter',
+    name: '',
+    description: '',
+    price: 0,
+    cycle: 'month',
+    cta: '',
+    featured: false,
+    features: [],
+  },
+  {
+    id: 'growth',
+    name: '',
+    description: '',
+    price: 0,
+    cycle: 'month',
+    cta: '',
+    featured: true,
+    features: [],
+  },
+  {
+    id: 'scale',
+    name: '',
+    description: '',
+    price: 0,
+    cycle: 'month',
+    cta: '',
+    featured: false,
+    features: [],
+  },
+]
 
-export const defaultSubscriptionPage: SubscriptionPage = {
-  slug: 'acme-analytics',
-  businessName: 'Acme Analytics',
-  headline: 'Simple plans for teams that need sharper revenue reporting.',
-  subheadline:
-    'Choose a plan, invite your operators, and keep billing tied to the work customers actually use.',
+export const draftSubscriptionPage: SubscriptionPage = {
+  slug: '',
+  businessName: '',
+  headline: '',
+  subheadline: '',
   accentColor: '#000000',
   backgroundColor: '#ffffff',
   currency: '$',
-  checkoutUrl: 'https://pay.example.com/checkout',
+  checkoutUrl: '',
   walletAddress: '',
-  tiers: [
-    {
-      id: 'starter',
-      name: 'Starter',
-      description: 'For founders validating a paid workflow.',
-      price: 29,
-      cycle: 'month',
-      cta: 'Start Starter',
-      featured: false,
-      features: ['Hosted pricing page', '3 active tiers', 'Basic analytics'],
-    },
-    {
-      id: 'growth',
-      name: 'Growth',
-      description: 'For teams selling subscriptions at scale.',
-      price: 89,
-      cycle: 'month',
-      cta: 'Start Growth',
-      featured: true,
-      features: [
-        'Unlimited hosted pages',
-        'Custom brand controls',
-        'Conversion event tracking',
-      ],
-    },
-    {
-      id: 'scale',
-      name: 'Scale',
-      description: 'For businesses with advanced billing operations.',
-      price: 249,
-      cycle: 'month',
-      cta: 'Contact Sales',
-      featured: false,
-      features: [
-        'Private checkout links',
-        'Approval workflows',
-        'Priority onboarding',
-      ],
-    },
-  ],
+  tiers: draftTiers,
 }
 
 export function createEmptyTier(): Tier {
@@ -97,99 +89,62 @@ export function createEmptyTier(): Tier {
 }
 
 export function createSlugFromBusinessName(businessName: string) {
-  return (
-    businessName
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || defaultSubscriptionPage.slug
-  )
+  return businessName
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
 }
 
-function normalizeSubscriptionPage(page: SubscriptionPage): SubscriptionPage {
+export function normalizeSubscriptionPage(page: SubscriptionPage): SubscriptionPage {
   return {
+    ...draftSubscriptionPage,
     ...page,
     slug: createSlugFromBusinessName(page.businessName),
+    currency: '$',
   }
 }
 
-function readStoredPages() {
-  if (typeof window === 'undefined') {
-    return [defaultSubscriptionPage]
-  }
+export const listSubscriptionPages = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    const { listSubscriptionPagesFromDatabase } = await import(
+      './subscriptionPage.server'
+    )
 
-  const savedPages = window.localStorage.getItem(PAGES_STORAGE_KEY)
+    return listSubscriptionPagesFromDatabase()
+  },
+)
 
-  if (savedPages) {
-    try {
-      const pages = JSON.parse(savedPages)
+export const getSubscriptionPage = createServerFn({ method: 'GET' })
+  .inputValidator((data: { slug?: string } | undefined) => data ?? {})
+  .handler(async ({ data }): Promise<SubscriptionPage | undefined> => {
+    const { getSubscriptionPageFromDatabase } = await import(
+      './subscriptionPage.server'
+    )
 
-      if (Array.isArray(pages) && pages.length > 0) {
-        return pages.map((page) =>
-          normalizeSubscriptionPage({ ...defaultSubscriptionPage, ...page }),
-        )
-      }
-    } catch {
-      return [defaultSubscriptionPage]
-    }
-  }
+    return getSubscriptionPageFromDatabase(data.slug)
+  })
 
-  const savedPage = window.localStorage.getItem(STORAGE_KEY)
+export const findSubscriptionPage = createServerFn({ method: 'GET' })
+  .inputValidator((data: { slug: string }) => data)
+  .handler(async ({ data }) => {
+    const { findSubscriptionPageInDatabase } = await import(
+      './subscriptionPage.server'
+    )
 
-  if (!savedPage) {
-    return [defaultSubscriptionPage]
-  }
+    return findSubscriptionPageInDatabase(data.slug)
+  })
 
-  try {
-    const migratedPage = normalizeSubscriptionPage({
-      ...defaultSubscriptionPage,
-      ...JSON.parse(savedPage),
-    })
+export const saveSubscriptionPage = createServerFn({ method: 'POST' })
+  .inputValidator((data: SubscriptionPage) => data)
+  .handler(async ({ data }) => {
+    const { saveSubscriptionPageToDatabase } = await import(
+      './subscriptionPage.server'
+    )
 
-    window.localStorage.setItem(PAGES_STORAGE_KEY, JSON.stringify([migratedPage]))
-
-    return [migratedPage]
-  } catch {
-    return [defaultSubscriptionPage]
-  }
-}
-
-export async function listSubscriptionPages(): Promise<SubscriptionPage[]> {
-  return readStoredPages()
-}
-
-export async function getSubscriptionPage(
-  slug?: string,
-): Promise<SubscriptionPage> {
-  const pages = readStoredPages()
-
-  if (!slug) {
-    return pages[0] ?? defaultSubscriptionPage
-  }
-
-  return pages.find((page) => page.slug === slug) ?? defaultSubscriptionPage
-}
-
-export async function findSubscriptionPage(slug: string) {
-  const pages = readStoredPages()
-
-  return pages.find((page) => page.slug === slug)
-}
-
-export async function saveSubscriptionPage(page: SubscriptionPage) {
-  const nextPage = normalizeSubscriptionPage(page)
-  const pages = readStoredPages()
-  const nextPages = pages.some((item) => item.slug === nextPage.slug)
-    ? pages.map((item) => (item.slug === nextPage.slug ? nextPage : item))
-    : [...pages, nextPage]
-
-  if (typeof window !== 'undefined') {
-    window.localStorage.setItem(PAGES_STORAGE_KEY, JSON.stringify(nextPages))
-  }
-
-  return nextPage
-}
+    return saveSubscriptionPageToDatabase(data)
+  })
 
 export function getPublicPagePath(slug: string) {
-  return `/pages/${slug || defaultSubscriptionPage.slug}`
+  return `/pages/${slug}`
 }

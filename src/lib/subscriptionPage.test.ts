@@ -2,16 +2,15 @@ import { describe, expect, it } from 'vitest'
 import {
   createEmptyTier,
   createSlugFromBusinessName,
-  defaultSubscriptionPage,
+  draftSubscriptionPage,
   getPublicPagePath,
-  getSubscriptionPage,
-  listSubscriptionPages,
+  normalizeSubscriptionPage,
 } from './subscriptionPage'
 
 describe('subscription page helpers', () => {
   it('ships with editable starter tiers', () => {
-    expect(defaultSubscriptionPage.tiers.length).toBeGreaterThan(1)
-    expect(defaultSubscriptionPage.tiers.some((tier) => tier.featured)).toBe(true)
+    expect(draftSubscriptionPage.tiers.length).toBeGreaterThan(1)
+    expect(draftSubscriptionPage.tiers.some((tier) => tier.featured)).toBe(true)
   })
 
   it('creates a draft tier and public path', () => {
@@ -24,13 +23,19 @@ describe('subscription page helpers', () => {
     expect(createSlugFromBusinessName('  Kim & Co. Billing!  ')).toBe(
       'kim-co-billing',
     )
-    expect(createSlugFromBusinessName('')).toBe(defaultSubscriptionPage.slug)
+    expect(createSlugFromBusinessName('')).toBe('')
   })
 
-  it('lists and resolves default pages outside the browser', async () => {
-    await expect(listSubscriptionPages()).resolves.toEqual([defaultSubscriptionPage])
-    await expect(getSubscriptionPage(defaultSubscriptionPage.slug)).resolves.toEqual(
-      defaultSubscriptionPage,
-    )
+  it('normalizes pages before persistence', () => {
+    expect(
+      normalizeSubscriptionPage({
+        ...draftSubscriptionPage,
+        businessName: 'Kim & Co. Billing!',
+        currency: 'EUR',
+      }),
+    ).toMatchObject({
+      slug: 'kim-co-billing',
+      currency: '$',
+    })
   })
 })

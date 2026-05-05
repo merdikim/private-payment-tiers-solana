@@ -25,9 +25,9 @@ const capabilities = [
     icon: Paintbrush,
   },
   {
-    title: 'Data-ready logic',
+    title: 'Database-backed logic',
     description:
-      'React Query wraps the read and save flow, so a backend can replace localStorage cleanly.',
+      'React Query and TanStack Start server functions persist page creation through Prisma and Postgres.',
     icon: Workflow,
   },
 ]

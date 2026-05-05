@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useServerFn } from '@tanstack/react-start'
 import { useState, type ReactNode } from 'react'
 import {
   Link as LinkIcon,
@@ -15,7 +16,7 @@ import {
   type SubscriptionPage,
   type Tier,
   createSlugFromBusinessName,
-  defaultSubscriptionPage,
+  draftSubscriptionPage,
   saveSubscriptionPage,
 } from '../lib/subscriptionPage'
 
@@ -64,20 +65,9 @@ const requiredPageFields = [
 
 function createBlankPage(): SubscriptionPage {
   return withSingleRecommendedTier({
-    ...defaultSubscriptionPage,
-    businessName: '',
-    slug: '',
-    headline: '',
-    subheadline: '',
-    checkoutUrl: '',
-    walletAddress: '',
-    tiers: defaultSubscriptionPage.tiers.map((tier) => ({
+    ...draftSubscriptionPage,
+    tiers: draftSubscriptionPage.tiers.map((tier) => ({
       ...tier,
-      name: '',
-      description: '',
-      price: 0,
-      cta: '',
-      features: [],
     })),
   })
 }
@@ -99,14 +89,25 @@ function NewCheckoutPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { toast } = useToast()
+  const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage)
   const [page, setPage] = useState<SubscriptionPage>(() => createBlankPage())
 
   const savePage = useMutation({
-    mutationFn: saveSubscriptionPage,
+    mutationFn: (nextPage: SubscriptionPage) =>
+      saveSubscriptionPageFn({ data: nextPage }),
     onSuccess: async (nextPage) => {
       queryClient.setQueryData(PAGE_QUERY_KEY, nextPage)
       await queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY })
       await navigate({ to: '/dashboard' })
+    },
+    onError: (error) => {
+      toast({
+        title: 'Page was not saved',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Check your database connection and try again.',
+      })
     },
   })
 

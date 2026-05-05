@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/pages/$slug')({
   loader: async ({ params }) => {
-    const page = await findSubscriptionPage(params.slug)
+    const page = await findSubscriptionPage({ data: { slug: params.slug } })
 
     if (!page) {
       throw notFound()
@@ -34,7 +34,7 @@ function PublicPricingPage() {
   const renderCheckoutCard = (tier: (typeof page.tiers)[number]) => (
     <article
       key={tier.id}
-      className="flex min-h-[430px] flex-col rounded-lg border bg-white p-5 shadow-sm"
+      className="flex min-h-107.5 flex-col rounded-lg border bg-white p-5 shadow-sm"
       style={{
         borderColor: tier.featured ? page.accentColor : '#e2e8f0',
       }}
