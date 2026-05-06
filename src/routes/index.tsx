@@ -2,11 +2,12 @@ import { usePrivy } from '@privy-io/react-auth'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import {
   ArrowRight,
+  BadgeDollarSign,
   CheckCircle2,
   CreditCard,
-  Globe2,
-  Layers3,
-  ShieldCheck,
+  Link as LinkIcon,
+  ListPlus,
+  Wallet,
 } from 'lucide-react'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
@@ -14,26 +15,44 @@ import { Button } from '@/components/ui/button'
 export const Route = createFileRoute('/')({ component: LandingPage })
 
 const benefits = [
-  'Create custom hosted subscription pages',
-  'Control plans, pricing, copy, and checkout links',
-  'Share one link from any app pricing section',
+  'One hosted link per business',
+  'Pricing tiers for items and services',
+  'Direct USDC settlement to a Solana wallet',
 ]
 
-const steps = [
+const pricingItems = [
   {
-    title: 'Sign in',
-    description: 'Use Privy to authenticate with email or wallet.',
-    icon: ShieldCheck,
+    name: 'Consultation',
+    description: 'Discovery call and initial recommendation.',
+    price: '$75',
   },
   {
-    title: 'Build tiers',
-    description: 'Create subscription plans for a business or product.',
-    icon: Layers3,
+    name: 'Service package',
+    description: 'Recurring operational support.',
+    price: '$250',
   },
   {
-    title: 'Publish link',
-    description: 'Drop the public page URL into your app pricing area.',
-    icon: Globe2,
+    name: 'Custom project',
+    description: 'Scoped work with a fixed checkout amount.',
+    price: '$1000',
+  },
+]
+
+const workflow = [
+  {
+    title: 'Business',
+    description: 'Add the business name and optional checkout headline.',
+    icon: CreditCard,
+  },
+  {
+    title: 'Tiers',
+    description: 'Create compact prices for each item, package, or service.',
+    icon: ListPlus,
+  },
+  {
+    title: 'Payment',
+    description: 'Customers pay the selected price with a Solana wallet.',
+    icon: Wallet,
   },
 ]
 
@@ -49,29 +68,35 @@ function LandingPage() {
 
   return (
     <main>
-      <section className="page-wrap grid min-h-[calc(100vh-220px)] items-center gap-10 px-4 py-12 lg:grid-cols-[1.08fr_0.92fr]">
-        <div>
-          <h1 className="m-0 max-w-5xl text-4xl font-black tracking-tight text-black sm:text-6xl lg:text-7xl">
-            Subscription pages your customers can trust.
+      <section className="page-wrap grid min-h-[calc(100vh-190px)] items-center gap-10 px-4 py-10 lg:grid-cols-[0.95fr_1.05fr]">
+        <div className="max-w-3xl">
+          <p className="island-kicker mb-3">USDC Checkout</p>
+          <h1 className="m-0 text-4xl font-black tracking-tight text-black sm:text-6xl lg:text-7xl">
+            A pricing menu that gets paid in Solana USDC.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-neutral-700">
-            TierFlow lets businesses create branded payment and subscription
-            tier pages, then link those pages from the pricing area of their
-            own apps.
+            Create one hosted checkout for a business, add prices for the items
+            or services it sells, and send customers a simple link to pay with a
+            Solana wallet.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild className='max-w-75 w-full' size="lg" variant="outline">
+            <Button asChild className="w-full max-w-72" size="lg">
               <Link to="/signin" className="no-underline">
-                Start building
+                Start pricing
                 <ArrowRight size={17} aria-hidden="true" />
+              </Link>
+            </Button>
+            <Button asChild className="w-full max-w-52" size="lg" variant="outline">
+              <Link to="/about" className="no-underline">
+                Learn more
               </Link>
             </Button>
           </div>
 
-          <ul className="mt-8 grid gap-3 p-0 text-sm font-semibold text-black sm:grid-cols-3">
+          <ul className="mt-8 grid gap-3 p-0 text-sm font-semibold text-black">
             {benefits.map((benefit) => (
-              <li key={benefit} className="flex gap-2">
+              <li key={benefit} className="flex items-center gap-2">
                 <CheckCircle2 size={17} aria-hidden="true" />
                 <span>{benefit}</span>
               </li>
@@ -79,59 +104,74 @@ function LandingPage() {
           </ul>
         </div>
 
-        <div className="rounded-lg border border-black bg-white p-4 shadow-[10px_10px_0_#000]">
-          <div className="border-b border-black pb-4">
-            <div className="mb-5 flex items-center justify-between">
+        <section className="island-shell overflow-hidden rounded-lg">
+          <div className="border-b border-black bg-white p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm font-black">
                 <CreditCard size={18} aria-hidden="true" />
-                Northstar CRM
+                Northstar Studio
               </div>
               <span className="rounded-md border border-black px-2 py-1 text-xs font-bold">
-                Live
+                Published
               </span>
             </div>
-            <h2 className="m-0 text-2xl font-black text-black">
-              Plans for growing revenue teams.
+            <h2 className="m-0 text-2xl font-black text-black sm:text-3xl">
+              Choose what you want to pay for.
             </h2>
             <p className="mb-0 mt-2 text-sm leading-6 text-neutral-700">
-              Three clean tiers, one checkout destination, and a page that
-              feels native to the business.
+              The customer sees a simple pricing list. The merchant receives
+              USDC directly to their wallet.
             </p>
           </div>
 
-          <div className="grid gap-3 pt-4 sm:grid-cols-3">
-            {['Launch', 'Growth', 'Scale'].map((plan, index) => (
+          <div className="divide-y divide-black">
+            {pricingItems.map((item) => (
               <article
-                key={plan}
-                className={`rounded-md border border-black p-3 ${
-                  index === 1 ? 'bg-black text-white' : 'bg-white text-black'
-                }`}
+                key={item.name}
+                className="grid gap-3 bg-white p-4 sm:grid-cols-[1fr_110px_150px] sm:items-center"
               >
-                <h3 className="m-0 text-sm font-black">{plan}</h3>
-                <p
-                  className={`mb-4 mt-2 text-xs leading-5 ${
-                    index === 1 ? 'text-neutral-300' : 'text-neutral-600'
-                  }`}
+                <div className="min-w-0">
+                  <h3 className="m-0 truncate text-base font-black text-black">
+                    {item.name}
+                  </h3>
+                  <p className="m-0 mt-1 text-xs leading-5 text-neutral-600">
+                    {item.description}
+                  </p>
+                </div>
+                <p className="m-0 text-2xl font-black text-black">
+                  {item.price}
+                </p>
+                <button
+                  type="button"
+                  className="h-10 rounded-md border border-black bg-black px-4 text-sm font-black text-white"
                 >
-                  {index === 0
-                    ? 'For first paid plans.'
-                    : index === 1
-                      ? 'For active teams.'
-                      : 'For custom billing.'}
-                </p>
-                <p className="m-0 text-2xl font-black">
-                  ${index === 0 ? '29' : index === 1 ? '89' : '249'}
-                </p>
+                  Pay USDC
+                </button>
               </article>
             ))}
           </div>
-        </div>
+
+          <div className="grid gap-3 border-t border-black bg-(--surface-muted) p-4 sm:grid-cols-3">
+            <div className="flex items-center gap-2 text-xs font-black">
+              <BadgeDollarSign size={17} aria-hidden="true" />
+              Dollar pricing
+            </div>
+            <div className="flex items-center gap-2 text-xs font-black">
+              <Wallet size={17} aria-hidden="true" />
+              Solana wallet
+            </div>
+            <div className="flex items-center gap-2 text-xs font-black">
+              <LinkIcon size={17} aria-hidden="true" />
+              Hosted link
+            </div>
+          </div>
+        </section>
       </section>
 
-      {/* <section className="border-y border-black bg-black px-4 py-10 text-white">
-        <div className="page-wrap grid gap-4 md:grid-cols-3">
-          {steps.map((step) => (
-            <article key={step.title} className="rounded-lg border border-white p-5">
+      <section className="border-y border-black bg-black px-4 py-10 text-white">
+        <div className="page-wrap grid gap-6 md:grid-cols-3">
+          {workflow.map((step) => (
+            <article key={step.title} className="border border-white p-5">
               <step.icon size={22} aria-hidden="true" />
               <h2 className="mb-2 mt-4 text-xl font-black">{step.title}</h2>
               <p className="m-0 text-sm leading-6 text-neutral-300">
@@ -140,7 +180,7 @@ function LandingPage() {
             </article>
           ))}
         </div>
-      </section> */}
+      </section>
     </main>
   )
 }

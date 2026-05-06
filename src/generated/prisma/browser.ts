@@ -22,3 +22,8 @@ export * from './enums.ts';
  * 
  */
 export type SubscriptionPage = Prisma.SubscriptionPageModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel

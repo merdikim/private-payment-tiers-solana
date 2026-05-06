@@ -51,7 +51,8 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  SubscriptionPage: 'SubscriptionPage'
+  SubscriptionPage: 'SubscriptionPage',
+  Payment: 'Payment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -86,6 +87,25 @@ export const SubscriptionPageScalarFieldEnum = {
 } as const
 
 export type SubscriptionPageScalarFieldEnum = (typeof SubscriptionPageScalarFieldEnum)[keyof typeof SubscriptionPageScalarFieldEnum]
+
+
+export const PaymentScalarFieldEnum = {
+  id: 'id',
+  pageSlug: 'pageSlug',
+  tierId: 'tierId',
+  tierName: 'tierName',
+  payerWallet: 'payerWallet',
+  merchantWallet: 'merchantWallet',
+  amountUsdCents: 'amountUsdCents',
+  amountUsdcBaseUnits: 'amountUsdcBaseUnits',
+  token: 'token',
+  network: 'network',
+  signature: 'signature',
+  status: 'status',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
 
 
 export const SortOrder = {

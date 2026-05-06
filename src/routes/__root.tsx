@@ -1,3 +1,4 @@
+import '../polyfills'
 import {
   HeadContent,
   Link,
@@ -26,7 +27,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TierFlow | Subscription page builder',
+        title: 'USDC Checkout | Solana payment links',
       },
     ],
     links: [
@@ -67,7 +68,7 @@ function NotFoundPage() {
             <Button asChild variant="outline">
               <Link to="/new" className="no-underline">
                 <Plus size={16} aria-hidden="true" />
-                New checkout
+                New USDC pricing
               </Link>
             </Button>
             <Button asChild variant="ghost">
@@ -91,9 +92,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="font-sans antialiased wrap-anywhere selection:bg-black selection:text-white">
         <AppProviders>
-          <Header />
-          {children}
-          <Footer />
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <div className="flex-1">{children}</div>
+            <Footer />
+          </div>
           <Toaster />
           <TanStackDevtools
             config={{

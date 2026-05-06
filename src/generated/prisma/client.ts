@@ -46,3 +46,8 @@ export { Prisma }
  * 
  */
 export type SubscriptionPage = Prisma.SubscriptionPageModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel

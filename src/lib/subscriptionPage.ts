@@ -1,13 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
 
-export type BillingCycle = 'month' | 'year'
-
 export type Tier = {
   id: string
   name: string
   description: string
   price: number
-  cycle: BillingCycle
   cta: string
   featured: boolean
   features: string[]
@@ -31,31 +28,19 @@ export const PAGES_QUERY_KEY = ['subscription-pages']
 
 export const draftTiers: Tier[] = [
   {
-    id: 'starter',
+    id: 'item-1',
     name: '',
     description: '',
     price: 0,
-    cycle: 'month',
     cta: '',
     featured: false,
     features: [],
   },
   {
-    id: 'growth',
+    id: 'item-2',
     name: '',
     description: '',
     price: 0,
-    cycle: 'month',
-    cta: '',
-    featured: true,
-    features: [],
-  },
-  {
-    id: 'scale',
-    name: '',
-    description: '',
-    price: 0,
-    cycle: 'month',
     cta: '',
     featured: false,
     features: [],
@@ -78,13 +63,12 @@ export const draftSubscriptionPage: SubscriptionPage = {
 export function createEmptyTier(): Tier {
   return {
     id: globalThis.crypto?.randomUUID?.() ?? String(Date.now()),
-    name: 'New tier',
-    description: 'Describe who this plan is built for.',
+    name: '',
+    description: '',
     price: 49,
-    cycle: 'month',
-    cta: 'Choose plan',
+    cta: '',
     featured: false,
-    features: ['Core subscription access', 'Customer support'],
+    features: [],
   }
 }
 
@@ -111,24 +95,33 @@ export function normalizeSubscriptionPage(page: SubscriptionPage): SubscriptionP
 
 export function getIncompleteTierNumbers(page: SubscriptionPage) {
   return page.tiers.flatMap((tier, index) => {
-    const hasFeatures = tier.features.some((feature) => feature.trim())
-    const isComplete =
-      tier.name.trim() &&
-      tier.description.trim() &&
-      tier.cta.trim() &&
-      tier.price > 0 &&
-      hasFeatures
+    const isComplete = tier.name.trim() && tier.price > 0
 
     return isComplete ? [] : [index + 1]
   })
 }
 
 export function assertSubscriptionPageCanBeSaved(page: SubscriptionPage) {
+  const missingPageFields = [
+    page.businessName.trim() ? '' : 'business name',
+    page.walletAddress.trim() ? '' : 'USDC receiving wallet',
+  ].filter(Boolean)
+
+  if (missingPageFields.length > 0) {
+    throw new Error(`Add ${missingPageFields.join(', ')} before publishing.`)
+  }
+
   const incompleteTierNumbers = getIncompleteTierNumbers(page)
+
+  if (page.tiers.length === 0) {
+    throw new Error('Add at least one pricing tier before publishing.')
+  }
 
   if (incompleteTierNumbers.length > 0) {
     throw new Error(
-      `Fill out tier ${incompleteTierNumbers.join(', ')} before publishing.`,
+      `Add a name and price for tier ${incompleteTierNumbers.join(
+        ', ',
+      )} before publishing.`,
     )
   }
 }

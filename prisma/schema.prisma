@@ -20,6 +20,27 @@ model SubscriptionPage {
   tiers           Json
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
+  payments        Payment[]
 
   @@map("subscription_pages")
+}
+
+model Payment {
+  id                  String           @id @default(uuid())
+  pageSlug            String           @map("page_slug")
+  tierId              String           @map("tier_id")
+  tierName            String           @map("tier_name")
+  payerWallet         String           @map("payer_wallet")
+  merchantWallet      String           @map("merchant_wallet")
+  amountUsdCents      Int              @map("amount_usd_cents")
+  amountUsdcBaseUnits BigInt           @map("amount_usdc_base_units")
+  token               String           @default("USDC")
+  network             String           @default("solana-mainnet")
+  signature           String           @unique
+  status              String           @default("confirmed")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  page                SubscriptionPage @relation(fields: [pageSlug], references: [slug], onDelete: Cascade)
+
+  @@index([pageSlug, createdAt])
+  @@map("payments")
 }

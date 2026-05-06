@@ -32,7 +32,6 @@ function parseTiers(tiers: Prisma.JsonValue): Tier[] {
       name: typeof item.name === 'string' ? item.name : '',
       description: typeof item.description === 'string' ? item.description : '',
       price: typeof item.price === 'number' ? item.price : 0,
-      cycle: item.cycle === 'year' ? 'year' : 'month',
       cta: typeof item.cta === 'string' ? item.cta : '',
       featured: Boolean(item.featured),
       features: Array.isArray(item.features)

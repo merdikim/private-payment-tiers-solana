@@ -11,11 +11,15 @@ import {
 describe('subscription page helpers', () => {
   it('ships with editable starter tiers', () => {
     expect(draftSubscriptionPage.tiers.length).toBeGreaterThan(1)
-    expect(draftSubscriptionPage.tiers.some((tier) => tier.featured)).toBe(true)
+    expect(draftSubscriptionPage.tiers.every((tier) => !tier.featured)).toBe(true)
   })
 
   it('creates a draft tier and public path', () => {
-    expect(createEmptyTier().features).toContain('Core subscription access')
+    expect(createEmptyTier()).toMatchObject({
+      name: '',
+      price: 49,
+      features: [],
+    })
     expect(getPublicPagePath('acme-analytics')).toBe('/pages/acme-analytics')
   })
 
@@ -41,7 +45,7 @@ describe('subscription page helpers', () => {
   })
 
   it('reports tiers missing required content', () => {
-    expect(getIncompleteTierNumbers(draftSubscriptionPage)).toEqual([1, 2, 3])
+    expect(getIncompleteTierNumbers(draftSubscriptionPage)).toEqual([1, 2])
 
     expect(
       getIncompleteTierNumbers({
@@ -49,11 +53,8 @@ describe('subscription page helpers', () => {
         tiers: [
           {
             ...draftSubscriptionPage.tiers[0],
-            name: 'Launch',
-            description: 'For getting started.',
+            name: 'Consultation',
             price: 29,
-            cta: 'Choose Launch',
-            features: ['Core access'],
           },
         ],
       }),

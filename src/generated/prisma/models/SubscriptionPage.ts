@@ -234,6 +234,7 @@ export type SubscriptionPageWhereInput = {
   tiers?: Prisma.JsonFilter<"SubscriptionPage">
   createdAt?: Prisma.DateTimeFilter<"SubscriptionPage"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SubscriptionPage"> | Date | string
+  payments?: Prisma.PaymentListRelationFilter
 }
 
 export type SubscriptionPageOrderByWithRelationInput = {
@@ -249,6 +250,7 @@ export type SubscriptionPageOrderByWithRelationInput = {
   tiers?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  payments?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
 export type SubscriptionPageWhereUniqueInput = Prisma.AtLeast<{
@@ -267,6 +269,7 @@ export type SubscriptionPageWhereUniqueInput = Prisma.AtLeast<{
   tiers?: Prisma.JsonFilter<"SubscriptionPage">
   createdAt?: Prisma.DateTimeFilter<"SubscriptionPage"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SubscriptionPage"> | Date | string
+  payments?: Prisma.PaymentListRelationFilter
 }, "slug">
 
 export type SubscriptionPageOrderByWithAggregationInput = {
@@ -318,6 +321,7 @@ export type SubscriptionPageCreateInput = {
   tiers: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  payments?: Prisma.PaymentCreateNestedManyWithoutPageInput
 }
 
 export type SubscriptionPageUncheckedCreateInput = {
@@ -333,6 +337,7 @@ export type SubscriptionPageUncheckedCreateInput = {
   tiers: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutPageInput
 }
 
 export type SubscriptionPageUpdateInput = {
@@ -348,6 +353,7 @@ export type SubscriptionPageUpdateInput = {
   tiers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.PaymentUpdateManyWithoutPageNestedInput
 }
 
 export type SubscriptionPageUncheckedUpdateInput = {
@@ -363,6 +369,7 @@ export type SubscriptionPageUncheckedUpdateInput = {
   tiers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutPageNestedInput
 }
 
 export type SubscriptionPageCreateManyInput = {
@@ -453,6 +460,11 @@ export type SubscriptionPageMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type SubscriptionPageScalarRelationFilter = {
+  is?: Prisma.SubscriptionPageWhereInput
+  isNot?: Prisma.SubscriptionPageWhereInput
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -461,6 +473,125 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type SubscriptionPageCreateNestedOneWithoutPaymentsInput = {
+  create?: Prisma.XOR<Prisma.SubscriptionPageCreateWithoutPaymentsInput, Prisma.SubscriptionPageUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.SubscriptionPageCreateOrConnectWithoutPaymentsInput
+  connect?: Prisma.SubscriptionPageWhereUniqueInput
+}
+
+export type SubscriptionPageUpdateOneRequiredWithoutPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.SubscriptionPageCreateWithoutPaymentsInput, Prisma.SubscriptionPageUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.SubscriptionPageCreateOrConnectWithoutPaymentsInput
+  upsert?: Prisma.SubscriptionPageUpsertWithoutPaymentsInput
+  connect?: Prisma.SubscriptionPageWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SubscriptionPageUpdateToOneWithWhereWithoutPaymentsInput, Prisma.SubscriptionPageUpdateWithoutPaymentsInput>, Prisma.SubscriptionPageUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type SubscriptionPageCreateWithoutPaymentsInput = {
+  slug: string
+  businessName: string
+  headline: string
+  subheadline?: string
+  accentColor: string
+  backgroundColor: string
+  currency?: string
+  checkoutUrl: string
+  walletAddress?: string
+  tiers: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SubscriptionPageUncheckedCreateWithoutPaymentsInput = {
+  slug: string
+  businessName: string
+  headline: string
+  subheadline?: string
+  accentColor: string
+  backgroundColor: string
+  currency?: string
+  checkoutUrl: string
+  walletAddress?: string
+  tiers: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SubscriptionPageCreateOrConnectWithoutPaymentsInput = {
+  where: Prisma.SubscriptionPageWhereUniqueInput
+  create: Prisma.XOR<Prisma.SubscriptionPageCreateWithoutPaymentsInput, Prisma.SubscriptionPageUncheckedCreateWithoutPaymentsInput>
+}
+
+export type SubscriptionPageUpsertWithoutPaymentsInput = {
+  update: Prisma.XOR<Prisma.SubscriptionPageUpdateWithoutPaymentsInput, Prisma.SubscriptionPageUncheckedUpdateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.SubscriptionPageCreateWithoutPaymentsInput, Prisma.SubscriptionPageUncheckedCreateWithoutPaymentsInput>
+  where?: Prisma.SubscriptionPageWhereInput
+}
+
+export type SubscriptionPageUpdateToOneWithWhereWithoutPaymentsInput = {
+  where?: Prisma.SubscriptionPageWhereInput
+  data: Prisma.XOR<Prisma.SubscriptionPageUpdateWithoutPaymentsInput, Prisma.SubscriptionPageUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type SubscriptionPageUpdateWithoutPaymentsInput = {
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  businessName?: Prisma.StringFieldUpdateOperationsInput | string
+  headline?: Prisma.StringFieldUpdateOperationsInput | string
+  subheadline?: Prisma.StringFieldUpdateOperationsInput | string
+  accentColor?: Prisma.StringFieldUpdateOperationsInput | string
+  backgroundColor?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  checkoutUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  walletAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  tiers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SubscriptionPageUncheckedUpdateWithoutPaymentsInput = {
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  businessName?: Prisma.StringFieldUpdateOperationsInput | string
+  headline?: Prisma.StringFieldUpdateOperationsInput | string
+  subheadline?: Prisma.StringFieldUpdateOperationsInput | string
+  accentColor?: Prisma.StringFieldUpdateOperationsInput | string
+  backgroundColor?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  checkoutUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  walletAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  tiers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type SubscriptionPageCountOutputType
+ */
+
+export type SubscriptionPageCountOutputType = {
+  payments: number
+}
+
+export type SubscriptionPageCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  payments?: boolean | SubscriptionPageCountOutputTypeCountPaymentsArgs
+}
+
+/**
+ * SubscriptionPageCountOutputType without action
+ */
+export type SubscriptionPageCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SubscriptionPageCountOutputType
+   */
+  select?: Prisma.SubscriptionPageCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * SubscriptionPageCountOutputType without action
+ */
+export type SubscriptionPageCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentWhereInput
+}
 
 
 export type SubscriptionPageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -476,6 +607,8 @@ export type SubscriptionPageSelect<ExtArgs extends runtime.Types.Extensions.Inte
   tiers?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  payments?: boolean | Prisma.SubscriptionPage$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.SubscriptionPageCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subscriptionPage"]>
 
 export type SubscriptionPageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -524,10 +657,18 @@ export type SubscriptionPageSelectScalar = {
 }
 
 export type SubscriptionPageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"slug" | "businessName" | "headline" | "subheadline" | "accentColor" | "backgroundColor" | "currency" | "checkoutUrl" | "walletAddress" | "tiers" | "createdAt" | "updatedAt", ExtArgs["result"]["subscriptionPage"]>
+export type SubscriptionPageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  payments?: boolean | Prisma.SubscriptionPage$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.SubscriptionPageCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type SubscriptionPageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type SubscriptionPageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $SubscriptionPagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SubscriptionPage"
-  objects: {}
+  objects: {
+    payments: Prisma.$PaymentPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     slug: string
     businessName: string
@@ -935,6 +1076,7 @@ readonly fields: SubscriptionPageFieldRefs;
  */
 export interface Prisma__SubscriptionPageClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  payments<T extends Prisma.SubscriptionPage$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SubscriptionPage$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -993,6 +1135,10 @@ export type SubscriptionPageFindUniqueArgs<ExtArgs extends runtime.Types.Extensi
    */
   omit?: Prisma.SubscriptionPageOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPageInclude<ExtArgs> | null
+  /**
    * Filter, which SubscriptionPage to fetch.
    */
   where: Prisma.SubscriptionPageWhereUniqueInput
@@ -1011,6 +1157,10 @@ export type SubscriptionPageFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.
    */
   omit?: Prisma.SubscriptionPageOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPageInclude<ExtArgs> | null
+  /**
    * Filter, which SubscriptionPage to fetch.
    */
   where: Prisma.SubscriptionPageWhereUniqueInput
@@ -1028,6 +1178,10 @@ export type SubscriptionPageFindFirstArgs<ExtArgs extends runtime.Types.Extensio
    * Omit specific fields from the SubscriptionPage
    */
   omit?: Prisma.SubscriptionPageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPageInclude<ExtArgs> | null
   /**
    * Filter, which SubscriptionPage to fetch.
    */
@@ -1077,6 +1231,10 @@ export type SubscriptionPageFindFirstOrThrowArgs<ExtArgs extends runtime.Types.E
    */
   omit?: Prisma.SubscriptionPageOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPageInclude<ExtArgs> | null
+  /**
    * Filter, which SubscriptionPage to fetch.
    */
   where?: Prisma.SubscriptionPageWhereInput
@@ -1124,6 +1282,10 @@ export type SubscriptionPageFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Omit specific fields from the SubscriptionPage
    */
   omit?: Prisma.SubscriptionPageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPageInclude<ExtArgs> | null
   /**
    * Filter, which SubscriptionPages to fetch.
    */
@@ -1173,6 +1335,10 @@ export type SubscriptionPageCreateArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.SubscriptionPageOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPageInclude<ExtArgs> | null
+  /**
    * The data needed to create a SubscriptionPage.
    */
   data: Prisma.XOR<Prisma.SubscriptionPageCreateInput, Prisma.SubscriptionPageUncheckedCreateInput>
@@ -1220,6 +1386,10 @@ export type SubscriptionPageUpdateArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the SubscriptionPage
    */
   omit?: Prisma.SubscriptionPageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPageInclude<ExtArgs> | null
   /**
    * The data needed to update a SubscriptionPage.
    */
@@ -1287,6 +1457,10 @@ export type SubscriptionPageUpsertArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.SubscriptionPageOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPageInclude<ExtArgs> | null
+  /**
    * The filter to search for the SubscriptionPage to update in case it exists.
    */
   where: Prisma.SubscriptionPageWhereUniqueInput
@@ -1313,6 +1487,10 @@ export type SubscriptionPageDeleteArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.SubscriptionPageOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPageInclude<ExtArgs> | null
+  /**
    * Filter which SubscriptionPage to delete.
    */
   where: Prisma.SubscriptionPageWhereUniqueInput
@@ -1333,6 +1511,30 @@ export type SubscriptionPageDeleteManyArgs<ExtArgs extends runtime.Types.Extensi
 }
 
 /**
+ * SubscriptionPage.payments
+ */
+export type SubscriptionPage$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payment
+   */
+  select?: Prisma.PaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payment
+   */
+  omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  where?: Prisma.PaymentWhereInput
+  orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
+}
+
+/**
  * SubscriptionPage without action
  */
 export type SubscriptionPageDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1344,4 +1546,8 @@ export type SubscriptionPageDefaultArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the SubscriptionPage
    */
   omit?: Prisma.SubscriptionPageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPageInclude<ExtArgs> | null
 }

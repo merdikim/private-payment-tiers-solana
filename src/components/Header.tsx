@@ -21,7 +21,7 @@ export default function Header() {
             className="inline-flex items-center gap-2 text-black no-underline"
           >
             <CreditCard size={18} aria-hidden="true" />
-            TierFlow
+            USDC Checkout
           </Link>
         </h2>
         <div className="ml-auto flex items-center gap-2">

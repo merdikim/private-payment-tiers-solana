@@ -7,27 +7,27 @@ export const Route = createFileRoute('/about')({
 
 const capabilities = [
   {
-    title: 'Hosted pricing pages',
+    title: 'Business pricing menus',
     description:
-      'Businesses can publish a dedicated subscription page and link to it from their own product.',
+      'Businesses can publish one USDC checkout with prices for each item, package, or service.',
     icon: Share2,
   },
   {
-    title: 'Tier management',
+    title: 'Tiered payments',
     description:
-      'Teams can add plans, adjust prices, mark a recommended option, and maintain feature lists.',
+      'Teams can add pricing tiers for the items they sell and adjust USD prices for Solana USDC payments.',
     icon: CreditCard,
   },
   {
-    title: 'Brand controls',
+    title: 'Merchant controls',
     description:
-      'Each page carries its own business name, copy, accent color, and checkout destination.',
+      'Each checkout carries its own business name, copy, accent color, and Solana receiving wallet.',
     icon: Paintbrush,
   },
   {
     title: 'Database-backed logic',
     description:
-      'React Query and TanStack Start server functions persist page creation through Prisma and Postgres.',
+      'React Query and TanStack Start server functions persist business pricing through Prisma and Postgres.',
     icon: Workflow,
   },
 ]
@@ -38,12 +38,12 @@ function About() {
       <section className="mb-6">
         <p className="island-kicker mb-2">Product</p>
         <h1 className="mb-3 max-w-3xl text-3xl font-bold tracking-tight text-(--sea-ink) sm:text-5xl">
-          A control plane for business-owned subscription pages.
+          A control plane for Solana USDC payments.
         </h1>
         <p className="m-0 max-w-3xl text-base leading-7 text-(--sea-ink-soft)">
-          TierFlow is set up as a practical starter for creating, customizing,
-          previewing, and publishing payment tier pages that other apps can link
-          to from their pricing experience.
+          USDC Checkout is set up for creating, customizing, previewing, and
+          publishing hosted pricing menus that other apps can link to from
+          their pricing experience.
         </p>
       </section>
 
