@@ -2,12 +2,8 @@ import { usePrivy } from '@privy-io/react-auth'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import {
   ArrowRight,
-  BadgeDollarSign,
   CheckCircle2,
   CreditCard,
-  Link as LinkIcon,
-  ListPlus,
-  Wallet,
 } from 'lucide-react'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
@@ -15,9 +11,9 @@ import { Button } from '@/components/ui/button'
 export const Route = createFileRoute('/')({ component: LandingPage })
 
 const benefits = [
-  'One hosted link per business',
-  'Pricing tiers for items and services',
-  'Direct USDC settlement to a Solana wallet',
+  'Private payments',
+  'Instant completion',
+  'Completely decentralized',
 ]
 
 const pricingItems = [
@@ -26,33 +22,15 @@ const pricingItems = [
     description: 'Discovery call and initial recommendation.',
     price: '$75',
   },
-  {
-    name: 'Service package',
-    description: 'Recurring operational support.',
-    price: '$250',
-  },
+  // {
+  //   name: 'Service package',
+  //   description: 'Recurring operational support.',
+  //   price: '$250',
+  // },
   {
     name: 'Custom project',
     description: 'Scoped work with a fixed checkout amount.',
     price: '$1000',
-  },
-]
-
-const workflow = [
-  {
-    title: 'Business',
-    description: 'Add the business name and optional checkout headline.',
-    icon: CreditCard,
-  },
-  {
-    title: 'Tiers',
-    description: 'Create compact prices for each item, package, or service.',
-    icon: ListPlus,
-  },
-  {
-    title: 'Payment',
-    description: 'Customers pay the selected price with a Solana wallet.',
-    icon: Wallet,
   },
 ]
 
@@ -68,9 +46,8 @@ function LandingPage() {
 
   return (
     <main>
-      <section className="page-wrap grid min-h-[calc(100vh-190px)] items-center gap-10 px-4 py-10 lg:grid-cols-[0.95fr_1.05fr]">
+      <section className="page-wrap grid min-h-[calc(100vh-250px)] items-center gap-10 px-4 py-10 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="max-w-3xl">
-          <p className="island-kicker mb-3">USDC Checkout</p>
           <h1 className="m-0 text-4xl font-black tracking-tight text-black sm:text-6xl lg:text-7xl">
             A pricing menu that gets paid in Solana USDC.
           </h1>
@@ -87,14 +64,9 @@ function LandingPage() {
                 <ArrowRight size={17} aria-hidden="true" />
               </Link>
             </Button>
-            <Button asChild className="w-full max-w-52" size="lg" variant="outline">
-              <Link to="/about" className="no-underline">
-                Learn more
-              </Link>
-            </Button>
           </div>
 
-          <ul className="mt-8 grid gap-3 p-0 text-sm font-semibold text-black">
+          <ul className="mt-8 gap-3 p-0 text-sm font-semibold flex text-black">
             {benefits.map((benefit) => (
               <li key={benefit} className="flex items-center gap-2">
                 <CheckCircle2 size={17} aria-hidden="true" />
@@ -143,6 +115,7 @@ function LandingPage() {
                 </p>
                 <button
                   type="button"
+                  disabled
                   className="h-10 rounded-md border border-black bg-black px-4 text-sm font-black text-white"
                 >
                   Pay USDC
@@ -150,36 +123,7 @@ function LandingPage() {
               </article>
             ))}
           </div>
-
-          <div className="grid gap-3 border-t border-black bg-(--surface-muted) p-4 sm:grid-cols-3">
-            <div className="flex items-center gap-2 text-xs font-black">
-              <BadgeDollarSign size={17} aria-hidden="true" />
-              Dollar pricing
-            </div>
-            <div className="flex items-center gap-2 text-xs font-black">
-              <Wallet size={17} aria-hidden="true" />
-              Solana wallet
-            </div>
-            <div className="flex items-center gap-2 text-xs font-black">
-              <LinkIcon size={17} aria-hidden="true" />
-              Hosted link
-            </div>
-          </div>
         </section>
-      </section>
-
-      <section className="border-y border-black bg-black px-4 py-10 text-white">
-        <div className="page-wrap grid gap-6 md:grid-cols-3">
-          {workflow.map((step) => (
-            <article key={step.title} className="border border-white p-5">
-              <step.icon size={22} aria-hidden="true" />
-              <h2 className="mb-2 mt-4 text-xl font-black">{step.title}</h2>
-              <p className="m-0 text-sm leading-6 text-neutral-300">
-                {step.description}
-              </p>
-            </article>
-          ))}
-        </div>
       </section>
     </main>
   )
