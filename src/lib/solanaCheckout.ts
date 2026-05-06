@@ -1,9 +1,17 @@
 import {
-  createAssociatedTokenAccountIdempotentInstruction,
-  createTransferCheckedInstruction,
-  getAssociatedTokenAddress,
-} from '@solana/spl-token'
-import { Connection, PublicKey, Transaction } from '@solana/web3.js'
+  CLOAK_PROGRAM_ID,
+  createUtxo,
+  createZeroUtxo,
+  fullWithdraw,
+  generateUtxoKeypair,
+  transact,
+} from '@cloak.dev/sdk'
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  VersionedTransaction,
+} from '@solana/web3.js'
 import { dollarsToUsdcBaseUnits } from './payments'
 
 const CONFIGURED_SOLANA_RPC_URL = String(import.meta.env.VITE_SOLANA_RPC_URL ?? '')
@@ -14,7 +22,10 @@ const USDC_MINT_ADDRESS =
     .trim()
     .replace(/^['"]|['"]$/g, '') ||
   'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-const USDC_DECIMALS = 6
+const CLOAK_RELAY_URL =
+  String(import.meta.env.VITE_CLOAK_RELAY_URL ?? '')
+    .trim()
+    .replace(/^['"]|['"]$/g, '') || undefined
 
 export const SOLANA_RPC_URLS = Array.from(
   new Set(
@@ -41,18 +52,38 @@ export function getPaymentErrorMessage(error: unknown) {
     return 'Could not reach a Solana RPC endpoint. Set VITE_SOLANA_RPC_URL to a reliable browser-accessible mainnet RPC.'
   }
 
+  if (message.toLowerCase().includes('insufficient')) {
+    return 'Your wallet does not have enough USDC or SOL to complete this private payment.'
+  }
+
+  if (message.toLowerCase().includes('user rejected')) {
+    return 'Payment was cancelled in your wallet.'
+  }
+
   return error instanceof Error ? error.message : 'USDC payment failed.'
 }
 
-export async function createUsdcTransferTransaction({
+export type CloakSignTransaction = <
+  T extends Transaction | VersionedTransaction,
+>(
+  transaction: T,
+) => Promise<T>
+
+export async function sendPrivateUsdcPayment({
   amountUsd,
   merchantWalletAddress,
   payerWalletAddress,
+  onProgress,
+  signMessage,
+  signTransaction,
   rpcUrls,
 }: {
   amountUsd: number
   merchantWalletAddress: string
+  onProgress?: (status: string) => void
   payerWalletAddress: string
+  signMessage?: (message: Uint8Array) => Promise<Uint8Array>
+  signTransaction: CloakSignTransaction
   rpcUrls: string[]
 }) {
   if (!USDC_MINT_ADDRESS) {
@@ -71,49 +102,61 @@ export async function createUsdcTransferTransaction({
     throw new Error('No Solana RPC endpoints are configured.')
   }
 
-  const mint = new PublicKey(USDC_MINT_ADDRESS)
+  const connection = await getAvailableSolanaConnection(rpcUrls)
   const payer = new PublicKey(payerWalletAddress)
   const merchant = new PublicKey(merchantWalletAddress)
-  const payerUsdcAccount = await getAssociatedTokenAddress(mint, payer)
-  const merchantUsdcAccount = await getAssociatedTokenAddress(mint, merchant)
+  const mint = new PublicKey(USDC_MINT_ADDRESS)
   const amount = dollarsToUsdcBaseUnits(amountUsd)
+  const owner = await generateUtxoKeypair()
+  const output = await createUtxo(amount, owner, mint)
+  const cloakOptions = {
+    connection,
+    programId: CLOAK_PROGRAM_ID,
+    //relayUrl: CLOAK_RELAY_URL,
+    depositorPublicKey: payer,
+    walletPublicKey: payer,
+    signMessage,
+    signTransaction,
+    enforceViewingKeyRegistration: false,
+    maxRootRetries: 5,
+    retryDelayMs: 1_500,
+    onProgress,
+  }
+
+  onProgress?.('Depositing USDC into Cloak...')
+  const deposited = await transact(
+    {
+      inputUtxos: [await createZeroUtxo(mint)],
+      outputUtxos: [output],
+      externalAmount: amount,
+      depositor: payer,
+    },
+    cloakOptions,
+  )
+
+  onProgress?.('Withdrawing privately to merchant...')
+  const withdrawn = await fullWithdraw(deposited.outputUtxos, merchant, {
+    ...cloakOptions,
+    addressLookupTableAccounts: deposited.addressLookupTableAccounts,
+    cachedMerkleTree: deposited.merkleTree,
+  })
+
+  return {
+    depositSignature: deposited.signature,
+    signature: withdrawn.signature,
+  }
+}
+
+async function getAvailableSolanaConnection(rpcUrls: string[]) {
   let lastRpcError: unknown
 
   for (const rpcUrl of rpcUrls) {
     const connection = new Connection(rpcUrl, 'confirmed')
 
     try {
-      const { blockhash, lastValidBlockHeight } =
-        await connection.getLatestBlockhash()
-      const transaction = new Transaction({
-        feePayer: payer,
-        recentBlockhash: blockhash,
-      }).add(
-        createAssociatedTokenAccountIdempotentInstruction(
-          payer,
-          merchantUsdcAccount,
-          merchant,
-          mint,
-        ),
-        createTransferCheckedInstruction(
-          payerUsdcAccount,
-          mint,
-          merchantUsdcAccount,
-          payer,
-          amount,
-          USDC_DECIMALS,
-        ),
-      )
+      await connection.getLatestBlockhash()
 
-      return {
-        blockhash,
-        connection,
-        lastValidBlockHeight,
-        transaction: transaction.serialize({
-          requireAllSignatures: false,
-          verifySignatures: false,
-        }),
-      }
+      return connection
     } catch (error) {
       lastRpcError = error
 

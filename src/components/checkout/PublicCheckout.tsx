@@ -209,7 +209,7 @@ function OrderSummary({
           </div>
 
           <div className="mt-4 grid gap-2 text-sm">
-            <CheckoutDetail label="Payment" value="Solana USDC" />
+            <CheckoutDetail label="Payment" value="Private USDC via Cloak" />
             <CheckoutDetail
               label="Wallet"
               value={formatWalletAddress(customerWalletAddress)}
@@ -244,7 +244,7 @@ function OrderSummary({
 
           <p className="mb-0 mt-4 flex items-center gap-2 text-xs font-semibold leading-5 text-(--sea-ink-soft)">
             <ShieldCheck size={15} aria-hidden="true" />
-            Signed from your connected Solana wallet.
+            Private payments made possible by Cloak.
           </p>
         </>
       ) : (
@@ -291,6 +291,14 @@ function PaymentMessage({ payment }: { payment: PaymentState }) {
       <p className="mb-0 mt-3 text-xs font-semibold text-emerald-700">
         Payment sent. Signature {payment.signature.slice(0, 8)}...
         {payment.signature.slice(-8)}
+      </p>
+    )
+  }
+
+  if (payment.status === 'confirming') {
+    return (
+      <p className="mb-0 mt-3 text-xs font-semibold text-slate-500">
+        {payment.message ?? 'Confirming private payment...'}
       </p>
     )
   }

@@ -1,12 +1,13 @@
 import { usePrivy } from '@privy-io/react-auth'
 import {
-  useSignAndSendTransaction,
+  useSignMessage,
+  useSignTransaction,
   useWallets,
 } from '@privy-io/react-auth/solana'
 import { useQueryClient } from '@tanstack/react-query'
 import { useServerFn } from '@tanstack/react-start'
-import bs58 from 'bs58'
 import { useState } from 'react'
+import { Transaction, VersionedTransaction } from '@solana/web3.js'
 import {
   PAYMENTS_QUERY_KEY,
   recordCheckoutPayment,
@@ -14,8 +15,8 @@ import {
 import type { SubscriptionPage, Tier } from '@/lib/subscriptionPage'
 import {
   SOLANA_RPC_URLS,
-  createUsdcTransferTransaction,
   getPaymentErrorMessage,
+  sendPrivateUsdcPayment,
 } from '@/lib/solanaCheckout'
 
 export type PaymentStatus =
@@ -28,6 +29,7 @@ export type PaymentStatus =
 export type PaymentState = {
   tierId?: string
   status: PaymentStatus
+  message?: string
   signature?: string
   error?: string
 }
@@ -35,7 +37,8 @@ export type PaymentState = {
 export function useCheckoutPayment(page: SubscriptionPage) {
   const { login, ready } = usePrivy()
   const { ready: solanaWalletsReady, wallets } = useWallets()
-  const { signAndSendTransaction } = useSignAndSendTransaction()
+  const { signMessage } = useSignMessage()
+  const { signTransaction } = useSignTransaction()
   const queryClient = useQueryClient()
   const recordCheckoutPaymentFn = useServerFn(recordCheckoutPayment)
   const [payment, setPayment] = useState<PaymentState>({ status: 'idle' })
@@ -77,30 +80,48 @@ export function useCheckoutPayment(page: SubscriptionPage) {
     }
 
     try {
-      setPayment({ tierId: tier.id, status: 'confirming' })
-
-      const { blockhash, connection, lastValidBlockHeight, transaction } =
-        await createUsdcTransferTransaction({
-          amountUsd: tier.price,
-          merchantWalletAddress,
-          payerWalletAddress: customerWalletAddress,
-          rpcUrls: SOLANA_RPC_URLS,
-        })
-      const { signature } = await signAndSendTransaction({
-        transaction,
-        wallet: solanaWallet,
-        chain: 'solana:mainnet',
+      setPayment({
+        tierId: tier.id,
+        status: 'confirming',
+        message: 'Preparing private USDC payment...',
       })
-      const signatureText = bs58.encode(signature)
 
-      await connection.confirmTransaction(
-        {
-          blockhash,
-          lastValidBlockHeight,
-          signature: signatureText,
+      const { signature } = await sendPrivateUsdcPayment({
+        amountUsd: tier.price,
+        merchantWalletAddress,
+        onProgress: (message) =>
+          setPayment({ tierId: tier.id, status: 'confirming', message }),
+        payerWalletAddress: customerWalletAddress,
+        rpcUrls: SOLANA_RPC_URLS,
+        signMessage: async (message) => {
+          const result = await signMessage({
+            message,
+            wallet: solanaWallet,
+          })
+
+          return result.signature
         },
-        'confirmed',
-      )
+        signTransaction: async (transaction) => {
+          const serializedTransaction =
+            transaction instanceof VersionedTransaction
+              ? transaction.serialize()
+              : transaction.serialize({
+                  requireAllSignatures: false,
+                  verifySignatures: false,
+                })
+          const { signedTransaction } = await signTransaction({
+            transaction: serializedTransaction,
+            wallet: solanaWallet,
+            chain: 'solana:mainnet',
+          })
+
+          return (
+            transaction instanceof VersionedTransaction
+              ? VersionedTransaction.deserialize(signedTransaction)
+              : Transaction.from(signedTransaction)
+          ) as typeof transaction
+        },
+      })
       await recordCheckoutPaymentFn({
         data: {
           pageSlug: page.slug,
@@ -109,7 +130,7 @@ export function useCheckoutPayment(page: SubscriptionPage) {
           payerWallet: customerWalletAddress,
           merchantWallet: merchantWalletAddress,
           amountUsd: tier.price,
-          signature: signatureText,
+          signature,
         },
       })
       await queryClient.invalidateQueries({ queryKey: PAYMENTS_QUERY_KEY })
@@ -117,7 +138,7 @@ export function useCheckoutPayment(page: SubscriptionPage) {
       setPayment({
         tierId: tier.id,
         status: 'success',
-        signature: signatureText,
+        signature,
       })
     } catch (error) {
       setPayment({
