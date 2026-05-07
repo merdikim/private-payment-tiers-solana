@@ -26,10 +26,16 @@ export default function AppProviders({ children }: { children: ReactNode }) {
         appearance: {
           theme: 'light',
           accentColor: '#000000',
-          logo: undefined,
           showWalletLoginFirst: true,
           walletChainType: 'solana-only',
-          walletList: ['phantom', 'metamask', 'backpack', 'detected_solana_wallets'],
+          walletList: [
+            'phantom',
+            'backpack',
+            'solflare',
+            'jupiter',
+            'detected_solana_wallets',
+            'wallet_connect_qr_solana',
+          ],
         },
         externalWallets: {
           solana: {
@@ -48,6 +54,9 @@ export default function AppProviders({ children }: { children: ReactNode }) {
           },
         },
         embeddedWallets: {
+          ethereum: {
+            createOnLogin: 'off',
+          },
           solana: {
             createOnLogin: 'all-users',
           },
