@@ -29,8 +29,17 @@ function toCheckoutPayment(
   };
 }
 
-export async function listCheckoutPaymentsFromDatabase() {
+export async function listCheckoutPaymentsFromDatabase(merchantWallet?: string) {
+  const walletAddress = merchantWallet?.trim();
+
+  if (!walletAddress) {
+    return [];
+  }
+
   const payments = await prisma.payment.findMany({
+    where: {
+      merchantWallet: walletAddress,
+    },
     orderBy: { createdAt: "desc" },
     take: 50,
   });

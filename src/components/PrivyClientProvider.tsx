@@ -2,7 +2,10 @@ import "@tanstack/react-start/client-only";
 import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
 import type { ReactNode } from "react";
 import { MerchantAuthContext } from "./merchantAuth";
-import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
+import {
+  toSolanaWalletConnectors,
+  useWallets,
+} from "@privy-io/react-auth/solana";
 import { createSolanaRpc, createSolanaRpcSubscriptions } from "@solana/kit";
 
 type PrivyClientProviderProps = {
@@ -59,6 +62,14 @@ export default function PrivyClientProvider({
 
 function PrivyMerchantAuthProvider({ children }: { children: ReactNode }) {
   const { authenticated, login, logout, ready } = usePrivy();
+  const { ready: walletReady, wallets } = useWallets();
+  const walletAddress =
+    wallets.find(
+      (wallet) =>
+        (wallet.standardWallet as { isPrivyWallet?: boolean }).isPrivyWallet,
+    )?.address ??
+    wallets[0]?.address ??
+    "";
 
   return (
     <MerchantAuthContext.Provider
@@ -69,6 +80,8 @@ function PrivyMerchantAuthProvider({ children }: { children: ReactNode }) {
         },
         logout,
         ready,
+        walletAddress,
+        walletReady,
       }}
     >
       {children}

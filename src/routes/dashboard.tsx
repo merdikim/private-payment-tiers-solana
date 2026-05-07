@@ -19,9 +19,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MerchantAuthGuard } from "@/components/MerchantAuthGuard";
+import { useMerchantAuth } from "@/components/merchantAuth";
 import { useToast } from "@/hooks/use-toast";
 import {
-  PAYMENTS_QUERY_KEY,
+  checkoutPaymentsQueryKey,
   type CheckoutPayment,
   listCheckoutPayments,
 } from "../lib/payments";
@@ -50,6 +51,10 @@ function DashboardRoute() {
 function Dashboard() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const {
+    walletAddress: merchantWalletAddress,
+    walletReady: merchantWalletReady,
+  } = useMerchantAuth();
   const listSubscriptionPagesFn = useServerFn(listSubscriptionPages);
   const listCheckoutPaymentsFn = useServerFn(listCheckoutPayments);
   const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage);
@@ -58,8 +63,12 @@ function Dashboard() {
     queryFn: () => listSubscriptionPagesFn(),
   });
   const { data: payments = [], isPending: paymentsPending } = useQuery({
-    queryKey: PAYMENTS_QUERY_KEY,
-    queryFn: () => listCheckoutPaymentsFn(),
+    queryKey: checkoutPaymentsQueryKey(merchantWalletAddress),
+    queryFn: () =>
+      listCheckoutPaymentsFn({
+        data: { merchantWallet: merchantWalletAddress },
+      }),
+    enabled: merchantWalletReady && Boolean(merchantWalletAddress.trim()),
   });
 
   const origin =

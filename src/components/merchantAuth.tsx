@@ -5,6 +5,8 @@ export type MerchantAuthState = {
   login: () => Promise<void>;
   logout: () => Promise<void>;
   ready: boolean;
+  walletAddress: string;
+  walletReady: boolean;
 };
 
 export const defaultMerchantAuthState: MerchantAuthState = {
@@ -12,6 +14,8 @@ export const defaultMerchantAuthState: MerchantAuthState = {
   login: async () => {},
   logout: async () => {},
   ready: false,
+  walletAddress: "",
+  walletReady: false,
 };
 
 export const MerchantAuthContext = createContext<MerchantAuthState>(

@@ -27,6 +27,9 @@ export type CheckoutPayment = {
 };
 
 export const PAYMENTS_QUERY_KEY = ["checkout-payments"];
+export function checkoutPaymentsQueryKey(merchantWallet?: string) {
+  return [...PAYMENTS_QUERY_KEY, merchantWallet?.trim() ?? ""];
+}
 const USDC_BASE_UNITS = 1_000_000;
 
 export function dollarsToCents(amountUsd: number) {
@@ -71,11 +74,11 @@ export const recordCheckoutPayment = createServerFn({ method: "POST" })
     return recordCheckoutPaymentInDatabase(data);
   });
 
-export const listCheckoutPayments = createServerFn({ method: "GET" }).handler(
-  async () => {
+export const listCheckoutPayments = createServerFn({ method: "GET" })
+  .inputValidator((data: { merchantWallet?: string } | undefined) => data ?? {})
+  .handler(async ({ data }) => {
     const { listCheckoutPaymentsFromDatabase } =
       await import("./payments.server");
 
-    return listCheckoutPaymentsFromDatabase();
-  },
-);
+    return listCheckoutPaymentsFromDatabase(data.merchantWallet);
+  });

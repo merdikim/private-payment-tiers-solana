@@ -5,6 +5,7 @@ import { useState, type ReactNode } from "react";
 import { Link as LinkIcon, Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MerchantAuthGuard } from "@/components/MerchantAuthGuard";
+import { useMerchantAuth } from "@/components/merchantAuth";
 import { useToast } from "@/hooks/use-toast";
 import {
   PAGE_QUERY_KEY,
@@ -55,7 +56,6 @@ const tierPlaceholders = [
 
 const requiredPageFields = [
   { label: "Business name", key: "businessName" },
-  { label: "USDC receiving wallet", key: "walletAddress" },
 ] as const;
 
 function createBlankPage(): SubscriptionPage {
@@ -71,6 +71,10 @@ function NewCheckoutPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const {
+    walletAddress: merchantWalletAddress,
+    walletReady: merchantWalletReady,
+  } = useMerchantAuth();
   const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage);
   const [page, setPage] = useState<SubscriptionPage>(() => createBlankPage());
 
@@ -104,8 +108,27 @@ function NewCheckoutPage() {
   const publishPage = () => {
     const pageToSave = {
       ...page,
+      walletAddress: merchantWalletAddress,
       subheadline: "",
     };
+
+    if (!merchantWalletReady) {
+      toast({
+        title: "Wallet is not ready yet",
+        description: "Wait a moment for Privy to finish loading your wallet.",
+      });
+      return;
+    }
+
+    if (!merchantWalletAddress.trim()) {
+      toast({
+        title: "No merchant wallet found",
+        description:
+          "Sign in again so Privy can attach a Solana wallet to your account.",
+      });
+      return;
+    }
+
     const missingFields = requiredPageFields
       .filter((field) => !pageToSave[field.key].trim())
       .map((field) => field.label);
@@ -180,24 +203,19 @@ function NewCheckoutPage() {
                 updatePage((current) => ({ ...current, headline }))
               }
             />
-            <Field
-              label="USDC receiving wallet"
-              value={page.walletAddress}
-              placeholder="Solana wallet address"
-              required
-              onChange={(walletAddress) =>
-                updatePage((current) => ({ ...current, walletAddress }))
-              }
-            />
             <div className="border-t border-(--line) pt-3">
               <Button
                 type="button"
                 className="w-full"
-                disabled={savePage.isPending}
+                disabled={savePage.isPending || !merchantWalletReady}
                 onClick={publishPage}
               >
                 <Save size={15} aria-hidden="true" />
-                {savePage.isPending ? "Publishing..." : "Publish checkout page"}
+                {savePage.isPending
+                  ? "Publishing..."
+                  : merchantWalletReady
+                    ? "Publish checkout page"
+                    : "Preparing wallet..."}
               </Button>
             </div>
           </Panel>
