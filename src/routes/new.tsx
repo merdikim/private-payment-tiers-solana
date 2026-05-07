@@ -9,6 +9,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { MerchantAuthGuard } from '@/components/MerchantAuthGuard'
 import { useToast } from '@/hooks/use-toast'
 import {
   PAGE_QUERY_KEY,
@@ -23,8 +24,16 @@ import {
 } from '../lib/subscriptionPage'
 
 export const Route = createFileRoute('/new')({
-  component: NewCheckoutPage,
+  component: NewCheckoutPageRoute,
 })
+
+function NewCheckoutPageRoute() {
+  return (
+    <MerchantAuthGuard>
+      <NewCheckoutPage />
+    </MerchantAuthGuard>
+  )
+}
 
 const pagePlaceholders = {
   businessName: 'Business name',

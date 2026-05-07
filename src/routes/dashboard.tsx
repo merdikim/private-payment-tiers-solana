@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { MerchantAuthGuard } from '@/components/MerchantAuthGuard'
 import { useToast } from '@/hooks/use-toast'
 import {
   PAYMENTS_QUERY_KEY,
@@ -34,7 +35,17 @@ import {
   saveSubscriptionPage,
 } from '../lib/subscriptionPage'
 
-export const Route = createFileRoute('/dashboard')({ component: Dashboard })
+export const Route = createFileRoute('/dashboard')({
+  component: DashboardRoute,
+})
+
+function DashboardRoute() {
+  return (
+    <MerchantAuthGuard>
+      <Dashboard />
+    </MerchantAuthGuard>
+  )
+}
 
 function Dashboard() {
   const queryClient = useQueryClient()
