@@ -1,28 +1,15 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { usePrivy } from '@privy-io/react-auth'
-import { Mail } from 'lucide-react'
-import { useEffect } from 'react'
+import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/signin')({ component: SignInPage })
 
 function SignInPage() {
   const navigate = useNavigate()
-  const { authenticated, login, ready } = usePrivy()
 
-  async function handleSignIn() {
-    try {
-      await login()
-    } catch (error) {
-      console.error('Privy sign-in failed', error)
-    }
+  async function continueWithoutAuth() {
+    await navigate({ to: '/dashboard' })
   }
-
-  useEffect(() => {
-    if (ready && authenticated) {
-      void navigate({ to: '/dashboard' })
-    }
-  }, [authenticated, navigate, ready])
 
   return (
     <main className="page-wrap flex min-h-[calc(100vh-230px)] items-center justify-center px-4 py-10">
@@ -38,12 +25,11 @@ function SignInPage() {
         <div className="mt-7 grid gap-3">
           <Button
             type="button"
-            disabled={!ready}
             size="lg"
-            onClick={() => void handleSignIn()}
+            onClick={() => void continueWithoutAuth()}
           >
-            <Mail size={17} aria-hidden="true" />
-            {ready ? 'Continue with email' : 'Preparing sign in'}
+            Continue to dashboard
+            <ArrowRight size={17} aria-hidden="true" />
           </Button>
         </div>
       </section>

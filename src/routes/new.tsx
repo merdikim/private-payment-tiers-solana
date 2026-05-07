@@ -1,5 +1,4 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useWallets } from '@privy-io/react-auth/solana'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useServerFn } from '@tanstack/react-start'
 import { useState, type ReactNode } from 'react'
@@ -68,16 +67,8 @@ function NewCheckoutPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { wallets } = useWallets()
   const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage)
   const [page, setPage] = useState<SubscriptionPage>(() => createBlankPage())
-  const privyWalletAddress =
-    wallets.find(
-      (wallet) =>
-        (wallet.standardWallet as { isPrivyWallet?: boolean }).isPrivyWallet,
-    )?.address ??
-    wallets[0]?.address ??
-    ''
 
   const savePage = useMutation({
     mutationFn: (nextPage: SubscriptionPage) =>
@@ -109,7 +100,6 @@ function NewCheckoutPage() {
   const publishPage = () => {
     const pageToSave = {
       ...page,
-      walletAddress: privyWalletAddress,
       subheadline: '',
     }
     const missingFields = requiredPageFields
@@ -183,6 +173,15 @@ function NewCheckoutPage() {
               placeholder={pagePlaceholders.headline}
               onChange={(headline) =>
                 updatePage((current) => ({ ...current, headline }))
+              }
+            />
+            <Field
+              label="USDC receiving wallet"
+              value={page.walletAddress}
+              placeholder="Solana wallet address"
+              required
+              onChange={(walletAddress) =>
+                updatePage((current) => ({ ...current, walletAddress }))
               }
             />
             <div className="border-t border-(--line) pt-3">
