@@ -21,12 +21,6 @@ export default function Header() {
         </h2>
         <div className="ml-auto flex items-center gap-2">
           {authenticated ? (
-            <>
-              <Button asChild variant="outline">
-                <Link to="/dashboard" className="no-underline">
-                  Dashboard
-                </Link>
-              </Button>
               <Button
                 type="button"
                 disabled={!ready}
@@ -35,7 +29,6 @@ export default function Header() {
                 <LogOut size={15} aria-hidden="true" />
                 Sign out
               </Button>
-            </>
           ) : (
             <Button asChild variant="outline">
               <Link to="/signin" className="no-underline">
