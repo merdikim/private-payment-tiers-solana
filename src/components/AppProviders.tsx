@@ -2,6 +2,7 @@ import { PrivyProvider } from '@privy-io/react-auth'
 import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana'
 import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ClientOnly } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 
 const queryClient = new QueryClient()
@@ -19,6 +20,7 @@ const solanaWalletConnectors = toSolanaWalletConnectors()
 
 export default function AppProviders({ children }: { children: ReactNode }) {
   return (
+    <ClientOnly>
     <PrivyProvider
       appId={privyAppId}
       config={{
@@ -56,5 +58,6 @@ export default function AppProviders({ children }: { children: ReactNode }) {
     >
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </PrivyProvider>
+    </ClientOnly>
   )
 }
