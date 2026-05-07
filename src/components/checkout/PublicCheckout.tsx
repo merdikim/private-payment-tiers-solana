@@ -1,27 +1,33 @@
 import { Check, ShieldCheck, Wallet } from 'lucide-react'
 import { useState } from 'react'
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { Button } from '@/components/ui/button'
-import type { PaymentState } from '@/hooks/useCheckoutPayment'
+import type {
+  PaymentState,
+  UsdcBalanceState,
+} from '@/hooks/useCheckoutPayment'
 import type { SubscriptionPage, Tier } from '@/lib/subscriptionPage'
 
 type PublicCheckoutProps = {
   customerWalletAddress?: string
   isCustomerWalletReady: boolean
-  isPrivyReady: boolean
+  isWalletConnecting: boolean
   merchantWalletAddress: string
   page: SubscriptionPage
   payment: PaymentState
   payWithUsdc: (tier: Tier) => Promise<void>
+  usdcBalance: UsdcBalanceState
 }
 
 export function PublicCheckout({
   customerWalletAddress,
   isCustomerWalletReady,
-  isPrivyReady,
+  isWalletConnecting,
   merchantWalletAddress,
   page,
   payment,
   payWithUsdc,
+  usdcBalance,
 }: PublicCheckoutProps) {
   const [selectedTierId, setSelectedTierId] = useState(page.tiers[0]?.id ?? '')
   const selectedTier =
@@ -63,10 +69,11 @@ export function PublicCheckout({
           currency={page.currency}
           customerWalletAddress={customerWalletAddress}
           isCustomerWalletReady={isCustomerWalletReady}
-          isPrivyReady={isPrivyReady}
+          isWalletConnecting={isWalletConnecting}
           merchantWalletAddress={merchantWalletAddress}
           payment={payment}
           selectedTier={selectedTier}
+          usdcBalance={usdcBalance}
           onPay={payWithUsdc}
         />
       </section>
@@ -143,20 +150,22 @@ function OrderSummary({
   currency,
   customerWalletAddress,
   isCustomerWalletReady,
-  isPrivyReady,
+  isWalletConnecting,
   merchantWalletAddress,
   payment,
   selectedTier,
+  usdcBalance,
   onPay,
 }: {
   accentColor: string
   currency: string
   customerWalletAddress?: string
   isCustomerWalletReady: boolean
-  isPrivyReady: boolean
+  isWalletConnecting: boolean
   merchantWalletAddress: string
   payment: PaymentState
   selectedTier?: Tier
+  usdcBalance: UsdcBalanceState
   onPay: (tier: Tier) => Promise<void>
 }) {
   const selectedPaymentIsActive = Boolean(
@@ -169,9 +178,8 @@ function OrderSummary({
     payment.tierId === selectedTier.id &&
     payment.status === 'confirming'
       ? 'Confirming...'
-      : isCustomerWalletReady && selectedTier
-        ? `Pay ${currency}${selectedTier.price}`
-        : 'Connect wallet'
+      : (isCustomerWalletReady && selectedTier) && `Pay ${currency}${selectedTier.price}`
+       
 
   return (
     <aside className="island-shell h-fit rounded-lg p-4 sm:p-5 lg:sticky lg:top-24">
@@ -215,6 +223,10 @@ function OrderSummary({
               value={formatWalletAddress(customerWalletAddress)}
             />
             <CheckoutDetail
+              label="USDC balance"
+              value={formatUsdcBalance(usdcBalance)}
+            />
+            <CheckoutDetail
               label="Receiving"
               value={formatWalletAddress(merchantWalletAddress)}
             />
@@ -228,17 +240,23 @@ function OrderSummary({
             </span>
           </div>
 
-          <Button
+          {!isCustomerWalletReady && <WalletMultiButton className="checkout-wallet-button mt-5" style={{ backgroundColor: accentColor, width:"100%", display: 'flex', justifyContent:'center', marginTop:'20px' }}>
+            <Wallet size={16} aria-hidden="true" className='mr-2' />Connect Wallet
+          </WalletMultiButton>}
+          {isCustomerWalletReady && <Button
             type="button"
             className="mt-5 w-full"
             size="lg"
-            disabled={!isPrivyReady || payment.status === 'confirming'}
+            disabled={
+              isWalletConnecting ||
+              payment.status === 'confirming'
+            }
             style={{ backgroundColor: accentColor }}
             onClick={() => void onPay(selectedTier)}
           >
             <Wallet size={16} aria-hidden="true" />
             {paymentButtonText}
-          </Button>
+          </Button>}
 
           {selectedPaymentIsActive ? <PaymentMessage payment={payment} /> : null}
 
@@ -275,6 +293,31 @@ function formatWalletAddress(address?: string) {
   }
 
   return `${address.slice(0, 4)}...${address.slice(-4)}`
+}
+
+function formatUsdcBalance(balance: UsdcBalanceState) {
+  if (balance.status === 'loading') {
+    return 'Loading...'
+  }
+
+  if (balance.status === 'error') {
+    return 'Unavailable'
+  }
+
+  if (balance.status !== 'success') {
+    return 'Connect wallet'
+  }
+
+  const amount = Number(balance.amount ?? 0)
+
+  if (!Number.isFinite(amount)) {
+    return `${balance.amount ?? '0'} USDC`
+  }
+
+  return `${amount.toLocaleString(undefined, {
+    maximumFractionDigits: 6,
+    minimumFractionDigits: amount > 0 && amount < 1 ? 2 : 0,
+  })} USDC`
 }
 
 function PaymentMessage({ payment }: { payment: PaymentState }) {

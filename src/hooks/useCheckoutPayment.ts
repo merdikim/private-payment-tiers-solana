@@ -1,13 +1,10 @@
-import { usePrivy } from '@privy-io/react-auth'
-import {
-  useSignMessage,
-  useSignTransaction,
-  useWallets,
-} from '@privy-io/react-auth/solana'
+import { getAssociatedTokenAddressSync } from '@solana/spl-token'
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { useQueryClient } from '@tanstack/react-query'
 import { useServerFn } from '@tanstack/react-start'
-import { useState } from 'react'
-import { Transaction, VersionedTransaction } from '@solana/web3.js'
+import { useEffect, useState } from 'react'
+import { PublicKey } from '@solana/web3.js'
 import {
   PAYMENTS_QUERY_KEY,
   recordCheckoutPayment,
@@ -15,6 +12,7 @@ import {
 import type { SubscriptionPage, Tier } from '@/lib/subscriptionPage'
 import {
   SOLANA_RPC_URLS,
+  USDC_MINT_ADDRESS,
   getPaymentErrorMessage,
   sendPrivateUsdcPayment,
 } from '@/lib/solanaCheckout'
@@ -34,37 +32,103 @@ export type PaymentState = {
   error?: string
 }
 
+export type UsdcBalanceState = {
+  amount?: string
+  error?: string
+  status: 'idle' | 'loading' | 'success' | 'error'
+}
+
 export function useCheckoutPayment(page: SubscriptionPage) {
-  const { login, ready } = usePrivy()
-  const { ready: solanaWalletsReady, wallets } = useWallets()
-  const { signMessage } = useSignMessage()
-  const { signTransaction } = useSignTransaction()
+  const { connection } = useConnection()
+  const {
+    connected,
+    connecting,
+    publicKey,
+    signMessage,
+    signTransaction,
+    wallet,
+  } = useWallet()
+  const { setVisible: setWalletModalVisible } = useWalletModal()
   const queryClient = useQueryClient()
   const recordCheckoutPaymentFn = useServerFn(recordCheckoutPayment)
   const [payment, setPayment] = useState<PaymentState>({ status: 'idle' })
-  const solanaWallet = wallets.find(
-    (wallet) =>
-      (wallet.standardWallet as { isPrivyWallet?: boolean }).isPrivyWallet,
-  )
-  const customerWalletAddress = solanaWallet?.address
+  const [usdcBalance, setUsdcBalance] = useState<UsdcBalanceState>({
+    status: 'idle',
+  })
+  const customerWalletAddress = publicKey?.toBase58()
   const merchantWalletAddress = page.walletAddress.trim()
   const isCustomerWalletReady = Boolean(
-    customerWalletAddress && solanaWalletsReady && solanaWallet,
+    connected && customerWalletAddress && wallet && signTransaction,
   )
 
-  const requestSolanaWallet = () => {
-    login({
-      loginMethods: ['email'],
-      walletChainType: 'solana-only',
-    })
-  }
-
-  const payWithUsdc = async (tier: Tier) => {
-    if (!ready) {
+  useEffect(() => {
+    if (!connected || !publicKey) {
+      setUsdcBalance({ status: 'idle' })
       return
     }
 
-    if (!isCustomerWalletReady || !customerWalletAddress || !solanaWallet) {
+    let isCurrent = true
+
+    async function loadUsdcBalance() {
+      setUsdcBalance({ status: 'loading' })
+
+      try {
+        const mint = new PublicKey(USDC_MINT_ADDRESS)
+        const tokenAccountAddress = getAssociatedTokenAddressSync(
+          mint,
+          publicKey,
+        )
+        const tokenAccount =
+          await connection.getAccountInfo(tokenAccountAddress)
+
+        if (!isCurrent) {
+          return
+        }
+
+        if (!tokenAccount) {
+          setUsdcBalance({ status: 'success', amount: '0' })
+          return
+        }
+
+        const balance =
+          await connection.getTokenAccountBalance(tokenAccountAddress)
+
+        if (!isCurrent) {
+          return
+        }
+
+        setUsdcBalance({
+          status: 'success',
+          amount: balance.value.uiAmountString ?? '0',
+        })
+      } catch (error) {
+        if (!isCurrent) {
+          return
+        }
+
+        setUsdcBalance({
+          status: 'error',
+          error:
+            error instanceof Error
+              ? error.message
+              : 'Could not load USDC balance.',
+        })
+      }
+    }
+
+    void loadUsdcBalance()
+
+    return () => {
+      isCurrent = false
+    }
+  }, [connected, connection, publicKey])
+
+  const requestSolanaWallet = () => {
+    setWalletModalVisible(true)
+  }
+
+  const payWithUsdc = async (tier: Tier) => {
+    if (!isCustomerWalletReady || !customerWalletAddress || !signTransaction) {
       setPayment({ tierId: tier.id, status: 'connecting' })
       requestSolanaWallet()
       return
@@ -94,33 +158,13 @@ export function useCheckoutPayment(page: SubscriptionPage) {
         payerWalletAddress: customerWalletAddress,
         rpcUrls: SOLANA_RPC_URLS,
         signMessage: async (message) => {
-          const result = await signMessage({
-            message,
-            wallet: solanaWallet,
-          })
+          if (!signMessage) {
+            throw new Error('The connected wallet cannot sign messages.')
+          }
 
-          return result.signature
+          return signMessage(message)
         },
-        signTransaction: async (transaction) => {
-          const serializedTransaction =
-            transaction instanceof VersionedTransaction
-              ? transaction.serialize()
-              : transaction.serialize({
-                  requireAllSignatures: false,
-                  verifySignatures: false,
-                })
-          const { signedTransaction } = await signTransaction({
-            transaction: serializedTransaction,
-            wallet: solanaWallet,
-            chain: 'solana:mainnet',
-          })
-
-          return (
-            transaction instanceof VersionedTransaction
-              ? VersionedTransaction.deserialize(signedTransaction)
-              : Transaction.from(signedTransaction)
-          ) as typeof transaction
-        },
+        signTransaction,
       })
       await recordCheckoutPaymentFn({
         data: {
@@ -152,9 +196,10 @@ export function useCheckoutPayment(page: SubscriptionPage) {
   return {
     customerWalletAddress,
     isCustomerWalletReady,
-    isPrivyReady: ready,
+    isWalletConnecting: connecting,
     merchantWalletAddress,
     payWithUsdc,
     payment,
+    usdcBalance,
   }
 }

@@ -17,7 +17,7 @@ import { dollarsToUsdcBaseUnits } from './payments'
 const CONFIGURED_SOLANA_RPC_URL = String(import.meta.env.VITE_SOLANA_RPC_URL ?? '')
   .trim()
   .replace(/^['"]|['"]$/g, '')
-const USDC_MINT_ADDRESS =
+export const USDC_MINT_ADDRESS =
   String(import.meta.env.VITE_SOLANA_USDC_MINT ?? '')
     .trim()
     .replace(/^['"]|['"]$/g, '') ||
