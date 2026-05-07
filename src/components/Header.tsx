@@ -1,11 +1,11 @@
-import { usePrivy } from '@privy-io/react-auth'
 import { Link } from '@tanstack/react-router'
 import { LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import delta_pay_logo from '@/assets/deltapay.png'
+import { useMerchantAuth } from './merchantAuth'
 
 export default function Header() {
-  const { authenticated, logout, ready } = usePrivy()
+  const { authenticated, logout, ready } = useMerchantAuth()
 
   return (
     <header className="sticky h-20 top-0 z-50 border-b bg-white border-black px-4">

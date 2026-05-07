@@ -1,4 +1,3 @@
-import { usePrivy } from '@privy-io/react-auth'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import {
   ArrowRight,
@@ -9,6 +8,7 @@ import {
 } from 'lucide-react'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { useMerchantAuth } from '@/components/merchantAuth'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
 
@@ -33,7 +33,7 @@ const pricingItems = [
 
 function LandingPage() {
   const navigate = useNavigate()
-  const { authenticated, ready } = usePrivy()
+  const { authenticated, ready } = useMerchantAuth()
 
   useEffect(() => {
     if (ready && authenticated) {

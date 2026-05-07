@@ -1,6 +1,6 @@
-import { usePrivy } from '@privy-io/react-auth'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, type ReactNode } from 'react'
+import { useMerchantAuth } from './merchantAuth'
 
 type MerchantAuthGuardProps = {
   children: ReactNode
@@ -8,7 +8,7 @@ type MerchantAuthGuardProps = {
 
 export function MerchantAuthGuard({ children }: MerchantAuthGuardProps) {
   const navigate = useNavigate()
-  const { authenticated, ready } = usePrivy()
+  const { authenticated, ready } = useMerchantAuth()
 
   useEffect(() => {
     if (ready && !authenticated) {

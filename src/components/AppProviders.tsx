@@ -1,11 +1,13 @@
-import { PrivyProvider } from '@privy-io/react-auth'
+import { ClientOnly } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type { ReactNode } from 'react'
+import { lazy, Suspense, type ReactNode } from 'react'
+import { MerchantAuthFallbackProvider } from './merchantAuth'
 
 const queryClient = new QueryClient()
 const privyAppId = String(import.meta.env.VITE_PRIVY_APP_ID ?? '')
   .trim()
   .replace(/^['"]|['"]$/g, '')
+const PrivyClientProvider = lazy(() => import('./PrivyClientProvider'))
 
 export default function AppProviders({ children }: { children: ReactNode }) {
   if (!privyAppId) {
@@ -28,25 +30,26 @@ export default function AppProviders({ children }: { children: ReactNode }) {
   }
 
   return (
-    <PrivyProvider
-      appId={privyAppId}
-      config={{
-        loginMethods: ['email'],
-        appearance: {
-          theme: 'light',
-          accentColor: '#000000',
-        },
-        embeddedWallets: {
-          ethereum: {
-            createOnLogin: 'off',
-          },
-          solana: {
-            createOnLogin: 'off',
-          },
-        },
-      }}
-    >
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </PrivyProvider>
+    <QueryClientProvider client={queryClient}>
+      <ClientOnly
+        fallback={
+          <MerchantAuthFallbackProvider>
+            {children}
+          </MerchantAuthFallbackProvider>
+        }
+      >
+        <Suspense
+          fallback={
+            <MerchantAuthFallbackProvider>
+              {children}
+            </MerchantAuthFallbackProvider>
+          }
+        >
+          <PrivyClientProvider appId={privyAppId}>
+            {children}
+          </PrivyClientProvider>
+        </Suspense>
+      </ClientOnly>
+    </QueryClientProvider>
   )
 }

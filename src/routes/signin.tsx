@@ -1,14 +1,14 @@
-import { usePrivy } from '@privy-io/react-auth'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Mail } from 'lucide-react'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { useMerchantAuth } from '@/components/merchantAuth'
 
 export const Route = createFileRoute('/signin')({ component: SignInPage })
 
 function SignInPage() {
   const navigate = useNavigate()
-  const { authenticated, login, ready } = usePrivy()
+  const { authenticated, login, ready } = useMerchantAuth()
 
   async function handleSignIn() {
     try {
