@@ -61,8 +61,17 @@ function toSubscriptionPage(
   });
 }
 
-export async function listSubscriptionPagesFromDatabase() {
+export async function listSubscriptionPagesFromDatabase(walletAddress?: string) {
+  const merchantWalletAddress = walletAddress?.trim();
+
+  if (!merchantWalletAddress) {
+    return [];
+  }
+
   const pages = await prisma.subscriptionPage.findMany({
+    where: {
+      walletAddress: merchantWalletAddress,
+    },
     orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
   });
 

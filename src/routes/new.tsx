@@ -9,7 +9,6 @@ import { useMerchantAuth } from "@/components/merchantAuth";
 import { useToast } from "@/hooks/use-toast";
 import {
   PAGE_QUERY_KEY,
-  PAGES_QUERY_KEY,
   type SubscriptionPage,
   type Tier,
   createEmptyTier,
@@ -17,6 +16,7 @@ import {
   draftSubscriptionPage,
   getIncompleteTierNumbers,
   saveSubscriptionPage,
+  subscriptionPagesQueryKey,
 } from "../lib/subscriptionPage";
 
 export const Route = createFileRoute("/new")({
@@ -83,7 +83,9 @@ function NewCheckoutPage() {
       saveSubscriptionPageFn({ data: nextPage }),
     onSuccess: async (nextPage) => {
       queryClient.setQueryData(PAGE_QUERY_KEY, nextPage);
-      await queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
+      await queryClient.invalidateQueries({
+        queryKey: subscriptionPagesQueryKey(merchantWalletAddress),
+      });
       toast({
         title: "USDC checkout created",
         description: `${nextPage.businessName} is ready to accept Solana USDC.`,

@@ -27,13 +27,13 @@ import {
   listCheckoutPayments,
 } from "../lib/payments";
 import {
-  PAGES_QUERY_KEY,
   type SubscriptionPage,
   type Tier,
   createEmptyTier,
   getPublicPagePath,
   listSubscriptionPages,
   saveSubscriptionPage,
+  subscriptionPagesQueryKey,
 } from "../lib/subscriptionPage";
 
 export const Route = createFileRoute("/dashboard")({
@@ -59,8 +59,12 @@ function Dashboard() {
   const listCheckoutPaymentsFn = useServerFn(listCheckoutPayments);
   const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage);
   const { data: pages = [], isPending } = useQuery({
-    queryKey: PAGES_QUERY_KEY,
-    queryFn: () => listSubscriptionPagesFn(),
+    queryKey: subscriptionPagesQueryKey(merchantWalletAddress),
+    queryFn: () =>
+      listSubscriptionPagesFn({
+        data: { walletAddress: merchantWalletAddress },
+      }),
+    enabled: merchantWalletReady && Boolean(merchantWalletAddress.trim()),
   });
   const { data: payments = [], isPending: paymentsPending } = useQuery({
     queryKey: checkoutPaymentsQueryKey(merchantWalletAddress),
@@ -91,7 +95,7 @@ function Dashboard() {
       saveSubscriptionPageFn({ data: nextPage }),
     onSuccess: async (nextPage, savedDraft) => {
       queryClient.setQueryData<SubscriptionPage[]>(
-        PAGES_QUERY_KEY,
+        subscriptionPagesQueryKey(merchantWalletAddress),
         (currentPages) => {
           if (!currentPages) {
             return [nextPage];
@@ -111,7 +115,9 @@ function Dashboard() {
         },
       );
       setSelectedSlug(nextPage.slug);
-      await queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
+      await queryClient.invalidateQueries({
+        queryKey: subscriptionPagesQueryKey(merchantWalletAddress),
+      });
       toast({
         title: "Checkout page updated",
         description: `${nextPage.businessName} has been saved.`,

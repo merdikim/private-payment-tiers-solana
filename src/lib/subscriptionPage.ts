@@ -25,6 +25,9 @@ export type SubscriptionPage = {
 
 export const PAGE_QUERY_KEY = ["subscription-page", "active"];
 export const PAGES_QUERY_KEY = ["subscription-pages"];
+export function subscriptionPagesQueryKey(walletAddress?: string) {
+  return [...PAGES_QUERY_KEY, walletAddress?.trim() ?? ""];
+}
 
 export const draftTiers: Tier[] = [
   {
@@ -154,14 +157,14 @@ export function assertSubscriptionPageCanBeSaved(page: SubscriptionPage) {
   }
 }
 
-export const listSubscriptionPages = createServerFn({ method: "GET" }).handler(
-  async () => {
+export const listSubscriptionPages = createServerFn({ method: "GET" })
+  .inputValidator((data: { walletAddress?: string } | undefined) => data ?? {})
+  .handler(async ({ data }) => {
     const { listSubscriptionPagesFromDatabase } =
       await import("./subscriptionPage.server");
 
-    return listSubscriptionPagesFromDatabase();
-  },
-);
+    return listSubscriptionPagesFromDatabase(data.walletAddress);
+  });
 
 export const getSubscriptionPage = createServerFn({ method: "GET" })
   .inputValidator((data: { slug?: string } | undefined) => data ?? {})
