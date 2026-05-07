@@ -43,7 +43,7 @@ function SignInPage() {
             onClick={() => void handleSignIn()}
           >
             <Mail size={17} aria-hidden="true" />
-            {ready ? 'Continue with email or wallet' : 'Preparing sign in'}
+            {ready ? 'Continue with email' : 'Preparing sign in'}
           </Button>
         </div>
       </section>

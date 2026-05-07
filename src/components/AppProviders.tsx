@@ -1,5 +1,4 @@
 import { PrivyProvider } from '@privy-io/react-auth'
-import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana'
 import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
@@ -15,32 +14,17 @@ const solanaRpcUrl =
 const solanaRpcSubscriptionsUrl = solanaRpcUrl
   .replace(/^https:/, 'wss:')
   .replace(/^http:/, 'ws:')
-const solanaWalletConnectors = toSolanaWalletConnectors()
 
 export default function AppProviders({ children }: { children: ReactNode }) {
   return (
     <PrivyProvider
       appId={privyAppId}
       config={{
-        loginMethods: ['email', 'wallet'],
+        loginMethods: ['email'],
         appearance: {
           theme: 'light',
           accentColor: '#000000',
-          showWalletLoginFirst: true,
           walletChainType: 'solana-only',
-          walletList: [
-            'phantom',
-            'backpack',
-            'solflare',
-            'jupiter',
-            'detected_solana_wallets',
-            'wallet_connect_qr_solana',
-          ],
-        },
-        externalWallets: {
-          solana: {
-            connectors: solanaWalletConnectors,
-          },
         },
         solana: {
           rpcs: {

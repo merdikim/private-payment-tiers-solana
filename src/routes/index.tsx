@@ -7,7 +7,7 @@ import {
   LockKeyhole,
   Wallet,
 } from 'lucide-react'
-import { useEffect, } from 'react'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
