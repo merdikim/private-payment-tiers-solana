@@ -1,20 +1,20 @@
-import { useNavigate } from '@tanstack/react-router'
-import { useEffect, type ReactNode } from 'react'
-import { useMerchantAuth } from './merchantAuth'
+import { useNavigate } from "@tanstack/react-router";
+import { useEffect, type ReactNode } from "react";
+import { useMerchantAuth } from "./merchantAuth";
 
 type MerchantAuthGuardProps = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
 export function MerchantAuthGuard({ children }: MerchantAuthGuardProps) {
-  const navigate = useNavigate()
-  const { authenticated, ready } = useMerchantAuth()
+  const navigate = useNavigate();
+  const { authenticated, ready } = useMerchantAuth();
 
   useEffect(() => {
     if (ready && !authenticated) {
-      void navigate({ to: '/signin' })
+      void navigate({ to: "/signin" });
     }
-  }, [authenticated, navigate, ready])
+  }, [authenticated, navigate, ready]);
 
   if (!ready || !authenticated) {
     return (
@@ -26,8 +26,8 @@ export function MerchantAuthGuard({ children }: MerchantAuthGuardProps) {
           </h1>
         </section>
       </main>
-    )
+    );
   }
 
-  return children
+  return children;
 }

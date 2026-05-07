@@ -1,48 +1,52 @@
-import type { Prisma } from '../generated/prisma/client'
-import { prisma } from './prisma.server'
+import type { Prisma } from "../generated/prisma/client";
+import { prisma } from "./prisma.server";
 import {
   type SubscriptionPage,
   type Tier,
   draftTiers,
   normalizeSubscriptionPage,
   selectSubscriptionPageTier,
-} from './subscriptionPage'
+} from "./subscriptionPage";
 
 type StoredSubscriptionPage = Awaited<
   ReturnType<typeof prisma.subscriptionPage.findFirst>
->
+>;
 
 function isLegacyDefaultPage(page: NonNullable<StoredSubscriptionPage>) {
   return (
-    page.slug === 'acme-analytics' &&
-    page.businessName === 'Acme Analytics' &&
-    page.checkoutUrl === 'https://pay.example.com/checkout'
-  )
+    page.slug === "acme-analytics" &&
+    page.businessName === "Acme Analytics" &&
+    page.checkoutUrl === "https://pay.example.com/checkout"
+  );
 }
 
 function parseTiers(tiers: Prisma.JsonValue): Tier[] {
   if (!Array.isArray(tiers)) {
-    return draftTiers
+    return draftTiers;
   }
 
   return tiers.map((tier) => {
-    const item = tier as Partial<Tier>
+    const item = tier as Partial<Tier>;
 
     return {
-      id: typeof item.id === 'string' ? item.id : crypto.randomUUID(),
-      name: typeof item.name === 'string' ? item.name : '',
-      description: typeof item.description === 'string' ? item.description : '',
-      price: typeof item.price === 'number' ? item.price : 0,
-      cta: typeof item.cta === 'string' ? item.cta : '',
+      id: typeof item.id === "string" ? item.id : crypto.randomUUID(),
+      name: typeof item.name === "string" ? item.name : "",
+      description: typeof item.description === "string" ? item.description : "",
+      price: typeof item.price === "number" ? item.price : 0,
+      cta: typeof item.cta === "string" ? item.cta : "",
       featured: Boolean(item.featured),
       features: Array.isArray(item.features)
-        ? item.features.filter((feature): feature is string => typeof feature === 'string')
+        ? item.features.filter(
+            (feature): feature is string => typeof feature === "string",
+          )
         : [],
-    }
-  })
+    };
+  });
 }
 
-function toSubscriptionPage(page: NonNullable<StoredSubscriptionPage>): SubscriptionPage {
+function toSubscriptionPage(
+  page: NonNullable<StoredSubscriptionPage>,
+): SubscriptionPage {
   return normalizeSubscriptionPage({
     slug: page.slug,
     businessName: page.businessName,
@@ -54,54 +58,59 @@ function toSubscriptionPage(page: NonNullable<StoredSubscriptionPage>): Subscrip
     checkoutUrl: page.checkoutUrl,
     walletAddress: page.walletAddress,
     tiers: parseTiers(page.tiers),
-  })
+  });
 }
 
 export async function listSubscriptionPagesFromDatabase() {
   const pages = await prisma.subscriptionPage.findMany({
-    orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }],
-  })
+    orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+  });
 
-  return pages.filter((page) => !isLegacyDefaultPage(page)).map(toSubscriptionPage)
+  return pages
+    .filter((page) => !isLegacyDefaultPage(page))
+    .map(toSubscriptionPage);
 }
 
-export async function findSubscriptionPageInDatabase(slug: string, tier?: string) {
+export async function findSubscriptionPageInDatabase(
+  slug: string,
+  tier?: string,
+) {
   const page = await prisma.subscriptionPage.findUnique({
     where: { slug },
-  })
+  });
 
   if (!page || isLegacyDefaultPage(page)) {
-    return undefined
+    return undefined;
   }
 
-  return selectSubscriptionPageTier(toSubscriptionPage(page), tier)
+  return selectSubscriptionPageTier(toSubscriptionPage(page), tier);
 }
 
 export async function getSubscriptionPageFromDatabase(slug?: string) {
   if (slug) {
-    return findSubscriptionPageInDatabase(slug)
+    return findSubscriptionPageInDatabase(slug);
   }
 
   const page = await prisma.subscriptionPage.findFirst({
-    orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }],
-  })
+    orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+  });
 
   if (!page || isLegacyDefaultPage(page)) {
-    return undefined
+    return undefined;
   }
 
-  return toSubscriptionPage(page)
+  return toSubscriptionPage(page);
 }
 
 export async function saveSubscriptionPageToDatabase(page: SubscriptionPage) {
-  const previousSlug = page.slug.trim()
-  const nextPage = normalizeSubscriptionPage(page)
+  const previousSlug = page.slug.trim();
+  const nextPage = normalizeSubscriptionPage(page);
   const existingPage =
     previousSlug && previousSlug !== nextPage.slug
       ? await prisma.subscriptionPage.findUnique({
           where: { slug: previousSlug },
         })
-      : null
+      : null;
 
   if (existingPage && !isLegacyDefaultPage(existingPage)) {
     const savedPage = await prisma.subscriptionPage.update({
@@ -113,14 +122,14 @@ export async function saveSubscriptionPageToDatabase(page: SubscriptionPage) {
         subheadline: nextPage.subheadline,
         accentColor: nextPage.accentColor,
         backgroundColor: nextPage.backgroundColor,
-        currency: '$',
+        currency: "$",
         checkoutUrl: nextPage.checkoutUrl,
         walletAddress: nextPage.walletAddress,
         tiers: nextPage.tiers,
       },
-    })
+    });
 
-    return toSubscriptionPage(savedPage)
+    return toSubscriptionPage(savedPage);
   }
 
   const savedPage = await prisma.subscriptionPage.upsert({
@@ -132,7 +141,7 @@ export async function saveSubscriptionPageToDatabase(page: SubscriptionPage) {
       subheadline: nextPage.subheadline,
       accentColor: nextPage.accentColor,
       backgroundColor: nextPage.backgroundColor,
-      currency: '$',
+      currency: "$",
       checkoutUrl: nextPage.checkoutUrl,
       walletAddress: nextPage.walletAddress,
       tiers: nextPage.tiers,
@@ -143,12 +152,12 @@ export async function saveSubscriptionPageToDatabase(page: SubscriptionPage) {
       subheadline: nextPage.subheadline,
       accentColor: nextPage.accentColor,
       backgroundColor: nextPage.backgroundColor,
-      currency: '$',
+      currency: "$",
       checkoutUrl: nextPage.checkoutUrl,
       walletAddress: nextPage.walletAddress,
       tiers: nextPage.tiers,
     },
-  })
+  });
 
-  return toSubscriptionPage(savedPage)
+  return toSubscriptionPage(savedPage);
 }

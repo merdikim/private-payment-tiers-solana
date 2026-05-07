@@ -1,13 +1,13 @@
-import { ClientOnly } from '@tanstack/react-router'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { lazy, Suspense, type ReactNode } from 'react'
-import { MerchantAuthFallbackProvider } from './merchantAuth'
+import { ClientOnly } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense, type ReactNode } from "react";
+import { MerchantAuthFallbackProvider } from "./merchantAuth";
 
-const queryClient = new QueryClient()
-const privyAppId = String(import.meta.env.VITE_PRIVY_APP_ID ?? '')
+const queryClient = new QueryClient();
+const privyAppId = String(import.meta.env.VITE_PRIVY_APP_ID ?? "")
   .trim()
-  .replace(/^['"]|['"]$/g, '')
-const PrivyClientProvider = lazy(() => import('./PrivyClientProvider'))
+  .replace(/^['"]|['"]$/g, "");
+const PrivyClientProvider = lazy(() => import("./PrivyClientProvider"));
 
 export default function AppProviders({ children }: { children: ReactNode }) {
   if (!privyAppId) {
@@ -26,7 +26,7 @@ export default function AppProviders({ children }: { children: ReactNode }) {
           </section>
         </main>
       </QueryClientProvider>
-    )
+    );
   }
 
   return (
@@ -51,5 +51,5 @@ export default function AppProviders({ children }: { children: ReactNode }) {
         </Suspense>
       </ClientOnly>
     </QueryClientProvider>
-  )
+  );
 }

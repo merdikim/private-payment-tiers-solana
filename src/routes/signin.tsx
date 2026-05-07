@@ -1,28 +1,28 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Mail } from 'lucide-react'
-import { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { useMerchantAuth } from '@/components/merchantAuth'
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Mail } from "lucide-react";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { useMerchantAuth } from "@/components/merchantAuth";
 
-export const Route = createFileRoute('/signin')({ component: SignInPage })
+export const Route = createFileRoute("/signin")({ component: SignInPage });
 
 function SignInPage() {
-  const navigate = useNavigate()
-  const { authenticated, login, ready } = useMerchantAuth()
+  const navigate = useNavigate();
+  const { authenticated, login, ready } = useMerchantAuth();
 
   async function handleSignIn() {
     try {
-      await login()
+      await login();
     } catch (error) {
-      console.error('Privy sign-in failed', error)
+      console.error("Privy sign-in failed", error);
     }
   }
 
   useEffect(() => {
     if (ready && authenticated) {
-      void navigate({ to: '/dashboard' })
+      void navigate({ to: "/dashboard" });
     }
-  }, [authenticated, navigate, ready])
+  }, [authenticated, navigate, ready]);
 
   return (
     <main className="page-wrap flex min-h-[calc(100vh-230px)] items-center justify-center px-4 py-10">
@@ -32,7 +32,8 @@ function SignInPage() {
           Sign in to Delta Pay.
         </h1>
         <p className="mt-4 text-sm leading-6 text-neutral-700">
-          create and manage checkout pages, business pricing tiers and checkout links.
+          create and manage checkout pages, business pricing tiers and checkout
+          links.
         </p>
 
         <div className="mt-7 grid gap-3">
@@ -43,10 +44,10 @@ function SignInPage() {
             onClick={() => void handleSignIn()}
           >
             <Mail size={17} aria-hidden="true" />
-            {ready ? 'Continue with email' : 'Preparing sign in'}
+            {ready ? "Continue with email" : "Preparing sign in"}
           </Button>
         </div>
       </section>
     </main>
-  )
+  );
 }

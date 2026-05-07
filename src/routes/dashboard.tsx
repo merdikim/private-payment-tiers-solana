@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useServerFn } from '@tanstack/react-start'
-import { useEffect, useState, type ReactNode } from 'react'
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   BadgeDollarSign,
   Copy,
@@ -16,15 +16,15 @@ import {
   Trash2,
   Wallet,
   X,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { MerchantAuthGuard } from '@/components/MerchantAuthGuard'
-import { useToast } from '@/hooks/use-toast'
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MerchantAuthGuard } from "@/components/MerchantAuthGuard";
+import { useToast } from "@/hooks/use-toast";
 import {
   PAYMENTS_QUERY_KEY,
   type CheckoutPayment,
   listCheckoutPayments,
-} from '../lib/payments'
+} from "../lib/payments";
 import {
   PAGES_QUERY_KEY,
   type SubscriptionPage,
@@ -33,50 +33,50 @@ import {
   getPublicPagePath,
   listSubscriptionPages,
   saveSubscriptionPage,
-} from '../lib/subscriptionPage'
+} from "../lib/subscriptionPage";
 
-export const Route = createFileRoute('/dashboard')({
+export const Route = createFileRoute("/dashboard")({
   component: DashboardRoute,
-})
+});
 
 function DashboardRoute() {
   return (
     <MerchantAuthGuard>
       <Dashboard />
     </MerchantAuthGuard>
-  )
+  );
 }
 
 function Dashboard() {
-  const queryClient = useQueryClient()
-  const { toast } = useToast()
-  const listSubscriptionPagesFn = useServerFn(listSubscriptionPages)
-  const listCheckoutPaymentsFn = useServerFn(listCheckoutPayments)
-  const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage)
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const listSubscriptionPagesFn = useServerFn(listSubscriptionPages);
+  const listCheckoutPaymentsFn = useServerFn(listCheckoutPayments);
+  const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage);
   const { data: pages = [], isPending } = useQuery({
     queryKey: PAGES_QUERY_KEY,
     queryFn: () => listSubscriptionPagesFn(),
-  })
+  });
   const { data: payments = [], isPending: paymentsPending } = useQuery({
     queryKey: PAYMENTS_QUERY_KEY,
     queryFn: () => listCheckoutPaymentsFn(),
-  })
+  });
 
   const origin =
-    typeof window === 'undefined'
-      ? 'https://usdc-checkout.local'
-      : window.location.origin
-  const activePages = pages.filter((page) => page.slug && page.walletAddress)
+    typeof window === "undefined"
+      ? "https://usdc-checkout.local"
+      : window.location.origin;
+  const activePages = pages.filter((page) => page.slug && page.walletAddress);
   const totalRevenue = payments.reduce(
     (sum, payment) => sum + payment.amountUsd,
     0,
-  )
+  );
   const successfulPayments = payments.filter(
-    (payment) => payment.status === 'confirmed',
-  ).length
-  const [selectedSlug, setSelectedSlug] = useState('')
+    (payment) => payment.status === "confirmed",
+  ).length;
+  const [selectedSlug, setSelectedSlug] = useState("");
   const selectedPage =
-    activePages.find((page) => page.slug === selectedSlug) ?? activePages[0]
+    activePages.find((page) => page.slug === selectedSlug) ?? activePages[0];
   const savePage = useMutation({
     mutationFn: (nextPage: SubscriptionPage) =>
       saveSubscriptionPageFn({ data: nextPage }),
@@ -85,50 +85,50 @@ function Dashboard() {
         PAGES_QUERY_KEY,
         (currentPages) => {
           if (!currentPages) {
-            return [nextPage]
+            return [nextPage];
           }
 
-          let replacedSavedPage = false
+          let replacedSavedPage = false;
           const updatedPages = currentPages.map((page) => {
             if (page.slug === savedDraft.slug || page.slug === nextPage.slug) {
-              replacedSavedPage = true
-              return nextPage
+              replacedSavedPage = true;
+              return nextPage;
             }
 
-            return page
-          })
+            return page;
+          });
 
-          return replacedSavedPage ? updatedPages : [nextPage, ...updatedPages]
+          return replacedSavedPage ? updatedPages : [nextPage, ...updatedPages];
         },
-      )
-      setSelectedSlug(nextPage.slug)
-      await queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY })
+      );
+      setSelectedSlug(nextPage.slug);
+      await queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
       toast({
-        title: 'Checkout page updated',
+        title: "Checkout page updated",
         description: `${nextPage.businessName} has been saved.`,
-      })
+      });
     },
     onError: (error) => {
       toast({
-        title: 'Checkout was not saved',
+        title: "Checkout was not saved",
         description:
           error instanceof Error
             ? error.message
-            : 'Check the required fields and try again.',
-      })
+            : "Check the required fields and try again.",
+      });
     },
-  })
+  });
 
   useEffect(() => {
     if (!activePages.length) {
-      setSelectedSlug('')
-      return
+      setSelectedSlug("");
+      return;
     }
 
     if (!activePages.some((page) => page.slug === selectedSlug)) {
-      setSelectedSlug(activePages[0].slug)
+      setSelectedSlug(activePages[0].slug);
     }
-  }, [activePages, selectedSlug])
+  }, [activePages, selectedSlug]);
 
   return (
     <main className="page-wrap min-h-[calc(100vh-230px)] px-4 py-8">
@@ -228,7 +228,10 @@ function Dashboard() {
               ) : (
                 <div className="divide-y divide-(--line)">
                   {payments.slice(0, 8).map((payment) => (
-                    <article key={payment.id} className="py-3 first:pt-0 last:pb-0">
+                    <article
+                      key={payment.id}
+                      className="py-3 first:pt-0 last:pb-0"
+                    >
                       <div className="mb-1 flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="m-0 truncate text-sm font-black text-(--sea-ink)">
@@ -258,7 +261,7 @@ function Dashboard() {
         </div>
       )}
     </main>
-  )
+  );
 }
 
 function ProjectSidebar({
@@ -267,10 +270,10 @@ function ProjectSidebar({
   selectedSlug,
   onSelect,
 }: {
-  pages: SubscriptionPage[]
-  payments: CheckoutPayment[]
-  selectedSlug: string
-  onSelect: (slug: string) => void
+  pages: SubscriptionPage[];
+  payments: CheckoutPayment[];
+  selectedSlug: string;
+  onSelect: (slug: string) => void;
 }) {
   return (
     <aside className="island-shell h-fit rounded-lg p-3 xl:sticky xl:top-24">
@@ -283,10 +286,10 @@ function ProjectSidebar({
 
       <div className="grid gap-2">
         {pages.map((page) => {
-          const isSelected = page.slug === selectedSlug
+          const isSelected = page.slug === selectedSlug;
           const pagePayments = payments.filter(
             (payment) => payment.pageSlug === page.slug,
-          )
+          );
 
           return (
             <button
@@ -294,8 +297,8 @@ function ProjectSidebar({
               type="button"
               className={`min-h-20 rounded-md border border-black p-3 text-left ${
                 isSelected
-                  ? 'bg-black text-white shadow-[4px_4px_0_#a3a3a3]'
-                  : 'bg-white text-black hover:bg-(--surface-muted)'
+                  ? "bg-black text-white shadow-[4px_4px_0_#a3a3a3]"
+                  : "bg-white text-black hover:bg-(--surface-muted)"
               }`}
               onClick={() => onSelect(page.slug)}
             >
@@ -305,24 +308,24 @@ function ProjectSidebar({
                 </span>
                 <span
                   className={`h-3 w-3 shrink-0 rounded-full border ${
-                    isSelected ? 'border-white' : 'border-black'
+                    isSelected ? "border-white" : "border-black"
                   }`}
                   style={{ backgroundColor: page.accentColor }}
                 />
               </div>
               <span
                 className={`block text-[11px] font-bold uppercase ${
-                  isSelected ? 'text-neutral-300' : 'text-(--sea-ink-soft)'
+                  isSelected ? "text-neutral-300" : "text-(--sea-ink-soft)"
                 }`}
               >
                 {page.tiers.length} tiers · {pagePayments.length} payments
               </span>
             </button>
-          )
+          );
         })}
       </div>
     </aside>
-  )
+  );
 }
 
 function ProjectEditor({
@@ -330,21 +333,23 @@ function ProjectEditor({
   isSaving,
   onSave,
 }: {
-  page: SubscriptionPage
-  isSaving: boolean
-  onSave: (page: SubscriptionPage) => void
+  page: SubscriptionPage;
+  isSaving: boolean;
+  onSave: (page: SubscriptionPage) => void;
 }) {
-  const [draft, setDraft] = useState(page)
-  const [isOpen, setIsOpen] = useState(false)
+  const [draft, setDraft] = useState(page);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    setDraft(page)
-    setIsOpen(false)
-  }, [page])
+    setDraft(page);
+    setIsOpen(false);
+  }, [page]);
 
-  const updateDraft = (recipe: (page: SubscriptionPage) => SubscriptionPage) => {
-    setDraft((current) => recipe(current))
-  }
+  const updateDraft = (
+    recipe: (page: SubscriptionPage) => SubscriptionPage,
+  ) => {
+    setDraft((current) => recipe(current));
+  };
 
   const updateTier = (id: string, patch: Partial<Tier>) => {
     updateDraft((current) => ({
@@ -352,15 +357,15 @@ function ProjectEditor({
       tiers: current.tiers.map((tier) =>
         tier.id === id ? { ...tier, ...patch } : tier,
       ),
-    }))
-  }
+    }));
+  };
 
   const addTier = () => {
     updateDraft((current) => ({
       ...current,
       tiers: [...current.tiers, createEmptyTier()],
-    }))
-  }
+    }));
+  };
 
   const removeTier = (id: string) => {
     updateDraft((current) => ({
@@ -369,8 +374,8 @@ function ProjectEditor({
         current.tiers.length <= 1
           ? current.tiers
           : current.tiers.filter((tier) => tier.id !== id),
-    }))
-  }
+    }));
+  };
 
   return (
     <>
@@ -430,7 +435,7 @@ function ProjectEditor({
                 onClick={() => onSave(draft)}
               >
                 <Save size={15} aria-hidden="true" />
-                {isSaving ? 'Saving...' : 'Save changes'}
+                {isSaving ? "Saving..." : "Save changes"}
               </Button>
             </div>
 
@@ -470,7 +475,12 @@ function ProjectEditor({
 
             <div className="mb-3 flex items-center justify-between gap-3">
               <h3 className="m-0 text-sm font-black text-(--sea-ink)">Tiers</h3>
-              <Button type="button" size="sm" variant="outline" onClick={addTier}>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={addTier}
+              >
                 <Plus size={15} aria-hidden="true" />
                 Add tier
               </Button>
@@ -524,7 +534,7 @@ function ProjectEditor({
                           className="min-w-0 flex-1 border-0 bg-transparent text-base font-black outline-none"
                           type="number"
                           min="0"
-                          value={tier.price > 0 ? String(tier.price) : ''}
+                          value={tier.price > 0 ? String(tier.price) : ""}
                           onChange={(event) =>
                             updateTier(tier.id, {
                               price: Number(event.target.value),
@@ -552,7 +562,7 @@ function ProjectEditor({
         </div>
       ) : null}
     </>
-  )
+  );
 }
 
 function ProjectDetails({
@@ -560,13 +570,13 @@ function ProjectDetails({
   payments,
   origin,
 }: {
-  page: SubscriptionPage
-  payments: CheckoutPayment[]
-  origin: string
+  page: SubscriptionPage;
+  payments: CheckoutPayment[];
+  origin: string;
 }) {
-  const publicPath = getPublicPagePath(page.slug)
-  const publicUrl = `${origin}${publicPath}`
-  const revenue = payments.reduce((sum, payment) => sum + payment.amountUsd, 0)
+  const publicPath = getPublicPagePath(page.slug);
+  const publicUrl = `${origin}${publicPath}`;
+  const revenue = payments.reduce((sum, payment) => sum + payment.amountUsd, 0);
 
   return (
     <section className="min-w-0 space-y-5">
@@ -648,7 +658,7 @@ function ProjectDetails({
 
       <section className="overflow-hidden rounded-lg border border-black bg-white">
         {page.tiers.map((tier, index) => {
-          const tierUrl = `${publicUrl}?tier=${index + 1}`
+          const tierUrl = `${publicUrl}?tier=${index + 1}`;
 
           return (
             <a
@@ -674,11 +684,11 @@ function ProjectDetails({
                 {tier.price}
               </p>
             </a>
-          )
+          );
         })}
       </section>
     </section>
-  )
+  );
 }
 
 function ProjectStat({
@@ -686,9 +696,9 @@ function ProjectStat({
   label,
   value,
 }: {
-  icon: ReactNode
-  label: string
-  value: string
+  icon: ReactNode;
+  label: string;
+  value: string;
 }) {
   return (
     <div className="flex min-h-24 items-center gap-3 border-b border-black py-4 last:border-b-0 md:border-b-0 md:border-r md:px-4 md:first:pl-0 md:last:border-r-0 md:last:pr-0">
@@ -702,7 +712,7 @@ function ProjectStat({
         <p className="m-0 mt-1 text-2xl font-black text-(--sea-ink)">{value}</p>
       </div>
     </div>
-  )
+  );
 }
 
 function MetricCard({
@@ -710,9 +720,9 @@ function MetricCard({
   label,
   value,
 }: {
-  icon: ReactNode
-  label: string
-  value: string
+  icon: ReactNode;
+  label: string;
+  value: string;
 }) {
   return (
     <section className="island-shell rounded-lg p-4">
@@ -724,7 +734,7 @@ function MetricCard({
       </p>
       <p className="m-0 mt-1 text-2xl font-black text-(--sea-ink)">{value}</p>
     </section>
-  )
+  );
 }
 
 function CopyRow({
@@ -734,15 +744,15 @@ function CopyRow({
   value,
   title,
 }: {
-  className?: string
-  icon: ReactNode
-  label: string
-  value: string
-  title: string
+  className?: string;
+  icon: ReactNode;
+  label: string;
+  value: string;
+  title: string;
 }) {
   return (
     <div
-      className={`flex min-h-8 items-center gap-2 rounded-md border border-(--line) bg-(--surface-muted) px-2.5 text-[11px] text-(--sea-ink-soft) ${className ?? ''}`}
+      className={`flex min-h-8 items-center gap-2 rounded-md border border-(--line) bg-(--surface-muted) px-2.5 text-[11px] text-(--sea-ink-soft) ${className ?? ""}`}
     >
       <span className="shrink-0">{icon}</span>
       <div className="min-w-0 flex-1">
@@ -761,7 +771,7 @@ function CopyRow({
         <span className="sr-only">{title}</span>
       </Button>
     </div>
-  )
+  );
 }
 
 function DashboardLoading() {
@@ -867,7 +877,10 @@ function DashboardLoading() {
           </div>
           <div className="grid gap-4">
             {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="border-b border-(--line) pb-4 last:border-b-0 last:pb-0">
+              <div
+                key={index}
+                className="border-b border-(--line) pb-4 last:border-b-0 last:pb-0"
+              >
                 <div className="mb-2 flex items-start justify-between gap-3">
                   <div className="h-4 w-28 rounded-md bg-(--surface-muted)" />
                   <div className="h-4 w-14 rounded-md bg-(--surface-muted)" />
@@ -879,5 +892,5 @@ function DashboardLoading() {
         </section>
       </aside>
     </div>
-  )
+  );
 }

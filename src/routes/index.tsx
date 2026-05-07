@@ -1,45 +1,45 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
   CheckCircle2,
   CreditCard,
   LockKeyhole,
   Wallet,
-} from 'lucide-react'
-import { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { useMerchantAuth } from '@/components/merchantAuth'
+} from "lucide-react";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { useMerchantAuth } from "@/components/merchantAuth";
 
-export const Route = createFileRoute('/')({ component: LandingPage })
+export const Route = createFileRoute("/")({ component: LandingPage });
 
 const benefits = [
-  'Create a hosted pricing page',
-  'Share/Integrate a public checkout link',
-  'Receive private Solana USDC payments',
-]
+  "Create a hosted pricing page",
+  "Share/Integrate a public checkout link",
+  "Receive private Solana USDC payments",
+];
 
 const pricingItems = [
   {
-    name: 'Consultation',
-    description: 'Discovery call and initial recommendation.',
-    price: '$75',
+    name: "Consultation",
+    description: "Discovery call and initial recommendation.",
+    price: "$75",
   },
   {
-    name: 'Custom project',
-    description: 'Scoped work with a fixed checkout amount.',
-    price: '$1000',
+    name: "Custom project",
+    description: "Scoped work with a fixed checkout amount.",
+    price: "$1000",
   },
-]
+];
 
 function LandingPage() {
-  const navigate = useNavigate()
-  const { authenticated, ready } = useMerchantAuth()
+  const navigate = useNavigate();
+  const { authenticated, ready } = useMerchantAuth();
 
   useEffect(() => {
     if (ready && authenticated) {
-      void navigate({ to: '/dashboard' })
+      void navigate({ to: "/dashboard" });
     }
-  }, [authenticated, navigate, ready])
+  }, [authenticated, navigate, ready]);
 
   return (
     <main>
@@ -50,8 +50,9 @@ function LandingPage() {
             Start accepting USDC payments on Solana in minutes.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-neutral-700 sm:text-lg">
-            Delta Pay lets any business accept private Solana USDC payments through a hosted checkout, 
-            simple payment links, and a merchant dashboard for tracking payments.
+            Delta Pay lets any business accept private Solana USDC payments
+            through a hosted checkout, simple payment links, and a merchant
+            dashboard for tracking payments.
           </p>
 
           <div className="mt-7 flex flex-wrap gap-3">
@@ -80,7 +81,7 @@ function LandingPage() {
         <ProductPreview />
       </section>
     </main>
-  )
+  );
 }
 
 function ProductPreview() {
@@ -111,15 +112,15 @@ function ProductPreview() {
             <article
               key={item.name}
               className={`grid gap-3 bg-white p-4 sm:grid-cols-[1fr_110px] sm:items-center ${
-                index === 0 ? 'shadow-[inset_5px_0_0_#000]' : ''
+                index === 0 ? "shadow-[inset_5px_0_0_#000]" : ""
               }`}
             >
               <div className="flex min-w-0 gap-3">
                 <span
                   className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-black ${
                     index === 0
-                      ? 'bg-black text-white'
-                      : 'bg-white text-transparent'
+                      ? "bg-black text-white"
+                      : "bg-white text-transparent"
                   }`}
                 >
                   <CheckCircle2 size={13} aria-hidden="true" />
@@ -174,7 +175,7 @@ function ProductPreview() {
         </aside>
       </div>
     </section>
-  )
+  );
 }
 
 function PreviewDetail({ label, value }: { label: string; value: string }) {
@@ -187,5 +188,5 @@ function PreviewDetail({ label, value }: { label: string; value: string }) {
         {value}
       </span>
     </div>
-  )
+  );
 }

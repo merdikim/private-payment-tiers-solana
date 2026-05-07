@@ -1,24 +1,24 @@
-import { Check, LogOut, ShieldCheck, Wallet } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import { Button } from '@/components/ui/button'
+import { Check, LogOut, ShieldCheck, Wallet } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { Button } from "@/components/ui/button";
 import type {
   PaymentState,
   UsdcBalanceState,
-} from '@/hooks/useCheckoutPayment'
-import type { SubscriptionPage, Tier } from '@/lib/subscriptionPage'
+} from "@/hooks/useCheckoutPayment";
+import type { SubscriptionPage, Tier } from "@/lib/subscriptionPage";
 
 type PublicCheckoutProps = {
-  customerWalletAddress?: string
-  disconnectWallet: () => Promise<void>
-  isCustomerWalletReady: boolean
-  isWalletConnecting: boolean
-  merchantWalletAddress: string
-  page: SubscriptionPage
-  payment: PaymentState
-  payWithUsdc: (tier: Tier) => Promise<void>
-  usdcBalance: UsdcBalanceState
-}
+  customerWalletAddress?: string;
+  disconnectWallet: () => Promise<void>;
+  isCustomerWalletReady: boolean;
+  isWalletConnecting: boolean;
+  merchantWalletAddress: string;
+  page: SubscriptionPage;
+  payment: PaymentState;
+  payWithUsdc: (tier: Tier) => Promise<void>;
+  usdcBalance: UsdcBalanceState;
+};
 
 export function PublicCheckout({
   customerWalletAddress,
@@ -31,9 +31,9 @@ export function PublicCheckout({
   payWithUsdc,
   usdcBalance,
 }: PublicCheckoutProps) {
-  const [selectedTierId, setSelectedTierId] = useState(page.tiers[0]?.id ?? '')
+  const [selectedTierId, setSelectedTierId] = useState(page.tiers[0]?.id ?? "");
   const selectedTier =
-    page.tiers.find((tier) => tier.id === selectedTierId) ?? page.tiers[0]
+    page.tiers.find((tier) => tier.id === selectedTierId) ?? page.tiers[0];
 
   return (
     <main
@@ -81,7 +81,7 @@ export function PublicCheckout({
         />
       </section>
     </main>
-  )
+  );
 }
 
 function CheckoutHeader({ page }: { page: SubscriptionPage }) {
@@ -97,7 +97,7 @@ function CheckoutHeader({ page }: { page: SubscriptionPage }) {
         </p>
       ) : null}
     </div>
-  )
+  );
 }
 
 function TierOption({
@@ -106,24 +106,24 @@ function TierOption({
   onSelect,
   tier,
 }: {
-  currency: string
-  isSelected: boolean
-  onSelect: () => void
-  tier: Tier
+  currency: string;
+  isSelected: boolean;
+  onSelect: () => void;
+  tier: Tier;
 }) {
   return (
     <button
       type="button"
       aria-pressed={isSelected}
       className={`grid min-h-24 w-full gap-3 border-b border-black bg-white p-4 text-left last:border-b-0 sm:grid-cols-[1fr_auto] sm:items-center sm:p-5 ${
-        isSelected ? 'shadow-[inset_5px_0_0_#000]' : ''
+        isSelected ? "shadow-[inset_5px_0_0_#000]" : ""
       }`}
       onClick={onSelect}
     >
       <span className="flex min-w-0 gap-3">
         <span
           className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-black ${
-            isSelected ? 'bg-black text-white' : 'bg-white text-transparent'
+            isSelected ? "bg-black text-white" : "bg-white text-transparent"
           }`}
         >
           <Check size={13} aria-hidden="true" />
@@ -145,7 +145,7 @@ function TierOption({
         {tier.price}
       </span>
     </button>
-  )
+  );
 }
 
 function OrderSummary({
@@ -161,30 +161,31 @@ function OrderSummary({
   usdcBalance,
   onPay,
 }: {
-  accentColor: string
-  currency: string
-  customerWalletAddress?: string
-  disconnectWallet: () => Promise<void>
-  isCustomerWalletReady: boolean
-  isWalletConnecting: boolean
-  merchantWalletAddress: string
-  payment: PaymentState
-  selectedTier?: Tier
-  usdcBalance: UsdcBalanceState
-  onPay: (tier: Tier) => Promise<void>
+  accentColor: string;
+  currency: string;
+  customerWalletAddress?: string;
+  disconnectWallet: () => Promise<void>;
+  isCustomerWalletReady: boolean;
+  isWalletConnecting: boolean;
+  merchantWalletAddress: string;
+  payment: PaymentState;
+  selectedTier?: Tier;
+  usdcBalance: UsdcBalanceState;
+  onPay: (tier: Tier) => Promise<void>;
 }) {
   const selectedPaymentIsActive = Boolean(
     selectedTier &&
-      payment.tierId === selectedTier.id &&
-      payment.status !== 'idle',
-  )
+    payment.tierId === selectedTier.id &&
+    payment.status !== "idle",
+  );
   const paymentButtonText =
     selectedTier &&
     payment.tierId === selectedTier.id &&
-    payment.status === 'confirming'
-      ? 'Confirming...'
-      : (isCustomerWalletReady && selectedTier) && `Pay ${currency}${selectedTier.price}`
-       
+    payment.status === "confirming"
+      ? "Confirming..."
+      : isCustomerWalletReady &&
+        selectedTier &&
+        `Pay ${currency}${selectedTier.price}`;
 
   return (
     <aside className="island-shell h-fit rounded-lg p-4 sm:p-5 lg:sticky lg:top-24">
@@ -192,7 +193,7 @@ function OrderSummary({
         <div className="min-w-0">
           <p className="island-kicker mb-2">Order summary</p>
           <h2 className="m-0 truncate text-2xl font-black text-(--sea-ink)">
-            {selectedTier?.name ?? 'No item selected'}
+            {selectedTier?.name ?? "No item selected"}
           </h2>
         </div>
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-black bg-(--surface-muted)">
@@ -260,25 +261,38 @@ function OrderSummary({
             </span>
           </div>
 
-          {!isCustomerWalletReady && <WalletMultiButton className="checkout-wallet-button mt-5" style={{ backgroundColor: accentColor, width:"100%", display: 'flex', justifyContent:'center', marginTop:'20px' }}>
-            <Wallet size={16} aria-hidden="true" className='mr-2' />Connect Wallet
-          </WalletMultiButton>}
-          {isCustomerWalletReady && <Button
-            type="button"
-            className="mt-5 w-full"
-            size="lg"
-            disabled={
-              isWalletConnecting ||
-              payment.status === 'confirming'
-            }
-            style={{ backgroundColor: accentColor }}
-            onClick={() => void onPay(selectedTier)}
-          >
-            <Wallet size={16} aria-hidden="true" />
-            {paymentButtonText}
-          </Button>}
+          {!isCustomerWalletReady && (
+            <WalletMultiButton
+              className="checkout-wallet-button mt-5"
+              style={{
+                backgroundColor: accentColor,
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "20px",
+              }}
+            >
+              <Wallet size={16} aria-hidden="true" className="mr-2" />
+              Connect Wallet
+            </WalletMultiButton>
+          )}
+          {isCustomerWalletReady && (
+            <Button
+              type="button"
+              className="mt-5 w-full"
+              size="lg"
+              disabled={isWalletConnecting || payment.status === "confirming"}
+              style={{ backgroundColor: accentColor }}
+              onClick={() => void onPay(selectedTier)}
+            >
+              <Wallet size={16} aria-hidden="true" />
+              {paymentButtonText}
+            </Button>
+          )}
 
-          {selectedPaymentIsActive ? <PaymentMessage payment={payment} /> : null}
+          {selectedPaymentIsActive ? (
+            <PaymentMessage payment={payment} />
+          ) : null}
 
           <p className="mb-0 mt-4 flex items-center gap-2 text-xs font-semibold leading-5 text-(--sea-ink-soft)">
             <ShieldCheck size={15} aria-hidden="true" />
@@ -291,7 +305,7 @@ function OrderSummary({
         </p>
       )}
     </aside>
-  )
+  );
 }
 
 function CheckoutDetail({ label, value }: { label: string; value: string }) {
@@ -304,7 +318,7 @@ function CheckoutDetail({ label, value }: { label: string; value: string }) {
         {value}
       </span>
     </div>
-  )
+  );
 }
 
 function CheckoutDetailWithAction({
@@ -312,9 +326,9 @@ function CheckoutDetailWithAction({
   label,
   value,
 }: {
-  action: ReactNode
-  label: string
-  value: string
+  action: ReactNode;
+  label: string;
+  value: string;
 }) {
   return (
     <div className="flex min-h-9 items-center justify-between gap-3 rounded-md border border-(--line) bg-(--surface-muted) px-3">
@@ -328,73 +342,73 @@ function CheckoutDetailWithAction({
         {action}
       </span>
     </div>
-  )
+  );
 }
 
 function formatWalletAddress(address?: string) {
   if (!address) {
-    return 'Not connected'
+    return "Not connected";
   }
 
-  return `${address.slice(0, 4)}...${address.slice(-4)}`
+  return `${address.slice(0, 4)}...${address.slice(-4)}`;
 }
 
 function formatUsdcBalance(balance: UsdcBalanceState) {
-  if (balance.status === 'loading') {
-    return 'Loading...'
+  if (balance.status === "loading") {
+    return "Loading...";
   }
 
-  if (balance.status === 'error') {
-    return 'Unavailable'
+  if (balance.status === "error") {
+    return "Unavailable";
   }
 
-  if (balance.status !== 'success') {
-    return 'Connect wallet'
+  if (balance.status !== "success") {
+    return "Connect wallet";
   }
 
-  const amount = Number(balance.amount ?? 0)
+  const amount = Number(balance.amount ?? 0);
 
   if (!Number.isFinite(amount)) {
-    return `${balance.amount ?? '0'} USDC`
+    return `${balance.amount ?? "0"} USDC`;
   }
 
   return `${amount.toLocaleString(undefined, {
     maximumFractionDigits: 6,
     minimumFractionDigits: amount > 0 && amount < 1 ? 2 : 0,
-  })} USDC`
+  })} USDC`;
 }
 
 function PaymentMessage({ payment }: { payment: PaymentState }) {
-  if (payment.status === 'connecting') {
+  if (payment.status === "connecting") {
     return (
       <p className="mb-0 mt-3 text-xs font-semibold text-slate-500">
         Choose a Solana wallet to continue.
       </p>
-    )
+    );
   }
 
-  if (payment.status === 'success' && payment.signature) {
+  if (payment.status === "success" && payment.signature) {
     return (
       <p className="mb-0 mt-3 text-xs font-semibold text-emerald-700">
         Payment sent. Signature {payment.signature.slice(0, 8)}...
         {payment.signature.slice(-8)}
       </p>
-    )
+    );
   }
 
-  if (payment.status === 'confirming') {
+  if (payment.status === "confirming") {
     return (
       <p className="mb-0 mt-3 text-xs font-semibold text-slate-500">
-        {payment.message ?? 'Confirming private payment...'}
+        {payment.message ?? "Confirming private payment..."}
       </p>
-    )
+    );
   }
 
-  if (payment.status === 'error' && payment.error) {
+  if (payment.status === "error" && payment.error) {
     return (
       <div className="mt-3 rounded-md border border-red-700 bg-red-50 px-3 py-2 text-xs font-semibold leading-5 text-red-800">
         <p className="m-0 font-black">
-          {payment.errorTitle ?? 'Payment failed'}
+          {payment.errorTitle ?? "Payment failed"}
         </p>
         <p className="mb-0 mt-1">{payment.error}</p>
         {payment.errorSuggestion ? (
@@ -404,8 +418,8 @@ function PaymentMessage({ payment }: { payment: PaymentState }) {
           <p className="mb-0 mt-1 text-red-700">You can try again.</p>
         ) : null}
       </div>
-    )
+    );
   }
 
-  return null
+  return null;
 }

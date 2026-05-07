@@ -1,45 +1,45 @@
-import '../polyfills'
+import "../polyfills";
 import {
   HeadContent,
   Link,
   Scripts,
   createRootRoute,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { Home, Plus, SearchX } from 'lucide-react'
-import AppProviders from '../components/AppProviders'
-import { Button } from '../components/ui/button'
-import Footer from '../components/Footer'
-import Header from '../components/Header'
-import { Toaster } from '../components/ui/toaster'
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import { Home, Plus, SearchX } from "lucide-react";
+import AppProviders from "../components/AppProviders";
+import { Button } from "../components/ui/button";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
+import { Toaster } from "../components/ui/toaster";
 
-import appCss from '../styles.css?url'
+import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'Delta Pay | Crypto payment for any business',
+        title: "Delta Pay | Crypto payment for any business",
       },
     ],
     links: [
       {
-        rel: 'stylesheet',
+        rel: "stylesheet",
         href: appCss,
       },
     ],
   }),
   notFoundComponent: NotFoundPage,
   shellComponent: RootDocument,
-})
+});
 
 function NotFoundPage() {
   return (
@@ -75,7 +75,7 @@ function NotFoundPage() {
         </div>
       </section>
     </main>
-  )
+  );
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -94,11 +94,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <Toaster />
           <TanStackDevtools
             config={{
-              position: 'bottom-right',
+              position: "bottom-right",
             }}
             plugins={[
               {
-                name: 'Tanstack Router',
+                name: "Tanstack Router",
                 render: <TanStackRouterDevtoolsPanel />,
               },
             ]}
@@ -107,5 +107,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }

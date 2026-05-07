@@ -1,19 +1,19 @@
 import {
   ConnectionProvider,
   WalletProvider,
-} from '@solana/wallet-adapter-react'
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import '@solana/wallet-adapter-react-ui/styles.css'
-import { createFileRoute, notFound } from '@tanstack/react-router'
-import type { ReactNode } from 'react'
-import { PublicCheckout } from '@/components/checkout/PublicCheckout'
-import { useCheckoutPayment } from '@/hooks/useCheckoutPayment'
-import { SOLANA_RPC_URLS } from '@/lib/solanaCheckout'
-import { findSubscriptionPage } from '@/lib/subscriptionPage'
+} from "@solana/wallet-adapter-react";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import "@solana/wallet-adapter-react-ui/styles.css";
+import { createFileRoute, notFound } from "@tanstack/react-router";
+import type { ReactNode } from "react";
+import { PublicCheckout } from "@/components/checkout/PublicCheckout";
+import { useCheckoutPayment } from "@/hooks/useCheckoutPayment";
+import { SOLANA_RPC_URLS } from "@/lib/solanaCheckout";
+import { findSubscriptionPage } from "@/lib/subscriptionPage";
 
-export const Route = createFileRoute('/business/$slug')({
+export const Route = createFileRoute("/business/$slug")({
   validateSearch: (search: Record<string, unknown>) => ({
-    tier: typeof search.tier === 'string' ? search.tier : undefined,
+    tier: typeof search.tier === "string" ? search.tier : undefined,
   }),
   loaderDeps: ({ search }) => ({
     tier: search.tier,
@@ -21,28 +21,27 @@ export const Route = createFileRoute('/business/$slug')({
   loader: async ({ deps, params }) => {
     const page = await findSubscriptionPage({
       data: { slug: params.slug, tier: deps.tier },
-    })
+    });
 
     if (!page) {
-      throw notFound()
+      throw notFound();
     }
 
-    return page
+    return page;
   },
   component: PublicPricingPage,
-})
+});
 
 function PublicPricingPage() {
-
   return (
     <CheckoutWalletProvider>
       <PublicPricingCheckout />
     </CheckoutWalletProvider>
-  )
+  );
 }
 
 function CheckoutWalletProvider({ children }: { children: ReactNode }) {
-  const endpoint = SOLANA_RPC_URLS[0] ?? 'https://api.mainnet-beta.solana.com'
+  const endpoint = SOLANA_RPC_URLS[0] ?? "https://api.mainnet-beta.solana.com";
 
   return (
     <ConnectionProvider endpoint={endpoint}>
@@ -50,12 +49,12 @@ function CheckoutWalletProvider({ children }: { children: ReactNode }) {
         <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
-  )
+  );
 }
 
 function PublicPricingCheckout() {
-  const page = Route.useLoaderData()
-  const checkoutPayment = useCheckoutPayment(page)
+  const page = Route.useLoaderData();
+  const checkoutPayment = useCheckoutPayment(page);
 
-  return <PublicCheckout page={page} {...checkoutPayment} />
+  return <PublicCheckout page={page} {...checkoutPayment} />;
 }

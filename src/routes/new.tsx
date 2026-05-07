@@ -1,16 +1,11 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useServerFn } from '@tanstack/react-start'
-import { useState, type ReactNode } from 'react'
-import {
-  Link as LinkIcon,
-  Plus,
-  Save,
-  Trash2,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { MerchantAuthGuard } from '@/components/MerchantAuthGuard'
-import { useToast } from '@/hooks/use-toast'
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useState, type ReactNode } from "react";
+import { Link as LinkIcon, Plus, Save, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MerchantAuthGuard } from "@/components/MerchantAuthGuard";
+import { useToast } from "@/hooks/use-toast";
 import {
   PAGE_QUERY_KEY,
   PAGES_QUERY_KEY,
@@ -21,47 +16,47 @@ import {
   draftSubscriptionPage,
   getIncompleteTierNumbers,
   saveSubscriptionPage,
-} from '../lib/subscriptionPage'
+} from "../lib/subscriptionPage";
 
-export const Route = createFileRoute('/new')({
+export const Route = createFileRoute("/new")({
   component: NewCheckoutPageRoute,
-})
+});
 
 function NewCheckoutPageRoute() {
   return (
     <MerchantAuthGuard>
       <NewCheckoutPage />
     </MerchantAuthGuard>
-  )
+  );
 }
 
 const pagePlaceholders = {
-  businessName: 'Business name',
-  headline: 'Your service/business description',
-}
+  businessName: "Business name",
+  headline: "Your service/business description",
+};
 
 const tierPlaceholders = [
   {
-    name: 'Consultation',
-    description: 'One-time service or item.',
-    price: '75',
+    name: "Consultation",
+    description: "One-time service or item.",
+    price: "75",
   },
   {
-    name: 'Service package',
-    description: 'Recurring item or retained service.',
-    price: '250',
+    name: "Service package",
+    description: "Recurring item or retained service.",
+    price: "250",
   },
   {
-    name: 'Custom project',
-    description: 'Higher-touch work priced separately.',
-    price: '1000',
+    name: "Custom project",
+    description: "Higher-touch work priced separately.",
+    price: "1000",
   },
-]
+];
 
 const requiredPageFields = [
-  { label: 'Business name', key: 'businessName' },
-  { label: 'USDC receiving wallet', key: 'walletAddress' },
-] as const
+  { label: "Business name", key: "businessName" },
+  { label: "USDC receiving wallet", key: "walletAddress" },
+] as const;
 
 function createBlankPage(): SubscriptionPage {
   return {
@@ -69,82 +64,83 @@ function createBlankPage(): SubscriptionPage {
     tiers: draftSubscriptionPage.tiers.map((tier) => ({
       ...tier,
     })),
-  }
+  };
 }
 
 function NewCheckoutPage() {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const { toast } = useToast()
-  const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage)
-  const [page, setPage] = useState<SubscriptionPage>(() => createBlankPage())
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage);
+  const [page, setPage] = useState<SubscriptionPage>(() => createBlankPage());
 
   const savePage = useMutation({
     mutationFn: (nextPage: SubscriptionPage) =>
       saveSubscriptionPageFn({ data: nextPage }),
     onSuccess: async (nextPage) => {
-      queryClient.setQueryData(PAGE_QUERY_KEY, nextPage)
-      await queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY })
+      queryClient.setQueryData(PAGE_QUERY_KEY, nextPage);
+      await queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
       toast({
-        title: 'USDC checkout created',
+        title: "USDC checkout created",
         description: `${nextPage.businessName} is ready to accept Solana USDC.`,
-      })
-      await navigate({ to: '/dashboard' })
+      });
+      await navigate({ to: "/dashboard" });
     },
     onError: (error) => {
       toast({
-        title: 'Page was not saved',
+        title: "Page was not saved",
         description:
           error instanceof Error
             ? error.message
-            : 'Check your database connection and try again.',
-      })
+            : "Check your database connection and try again.",
+      });
     },
-  })
+  });
 
   const updatePage = (recipe: (page: SubscriptionPage) => SubscriptionPage) => {
-    setPage((current) => recipe(current))
-  }
+    setPage((current) => recipe(current));
+  };
 
   const publishPage = () => {
     const pageToSave = {
       ...page,
-      subheadline: '',
-    }
+      subheadline: "",
+    };
     const missingFields = requiredPageFields
       .filter((field) => !pageToSave[field.key].trim())
-      .map((field) => field.label)
+      .map((field) => field.label);
 
     if (missingFields.length > 0) {
       toast({
-        title: 'Required details missing',
-        description: `Add: ${missingFields.join(', ')}`,
-      })
-      return
+        title: "Required details missing",
+        description: `Add: ${missingFields.join(", ")}`,
+      });
+      return;
     }
 
-    const incompleteTierNumbers = getIncompleteTierNumbers(pageToSave)
+    const incompleteTierNumbers = getIncompleteTierNumbers(pageToSave);
 
     if (incompleteTierNumbers.length > 0) {
       toast({
-        title: 'Tier details missing',
+        title: "Tier details missing",
         description: `Fill out tier ${incompleteTierNumbers.join(
-          ', ',
+          ", ",
         )}: name and price.`,
-      })
-      return
+      });
+      return;
     }
 
     if (pageToSave.tiers.length === 0) {
       toast({
-        title: 'No pricing tiers',
-        description: 'Add at least one item or service price before publishing.',
-      })
-      return
+        title: "No pricing tiers",
+        description:
+          "Add at least one item or service price before publishing.",
+      });
+      return;
     }
 
-    savePage.mutate(pageToSave)
-  }
+    savePage.mutate(pageToSave);
+  };
 
   return (
     <main className="page-wrap px-4 py-8">
@@ -201,7 +197,7 @@ function NewCheckoutPage() {
                 onClick={publishPage}
               >
                 <Save size={15} aria-hidden="true" />
-                {savePage.isPending ? 'Publishing...' : 'Publish checkout page'}
+                {savePage.isPending ? "Publishing..." : "Publish checkout page"}
               </Button>
             </div>
           </Panel>
@@ -210,7 +206,7 @@ function NewCheckoutPage() {
         <PricingPreview page={page} updatePage={updatePage} />
       </section>
     </main>
-  )
+  );
 }
 
 function Panel({
@@ -219,10 +215,10 @@ function Panel({
   action,
   children,
 }: {
-  title: string
-  icon: ReactNode
-  action?: ReactNode
-  children: ReactNode
+  title: string;
+  icon: ReactNode;
+  action?: ReactNode;
+  children: ReactNode;
 }) {
   return (
     <section className="island-shell rounded-lg p-4">
@@ -235,7 +231,7 @@ function Panel({
       </div>
       <div className="space-y-3">{children}</div>
     </section>
-  )
+  );
 }
 
 function Field({
@@ -243,15 +239,15 @@ function Field({
   value,
   placeholder,
   required = false,
-  type = 'text',
+  type = "text",
   onChange,
 }: {
-  label: string
-  value: string
-  placeholder?: string
-  required?: boolean
-  type?: string
-  onChange: (value: string) => void
+  label: string;
+  value: string;
+  placeholder?: string;
+  required?: boolean;
+  type?: string;
+  onChange: (value: string) => void;
 }) {
   return (
     <label className="block">
@@ -269,7 +265,7 @@ function Field({
         onChange={(event) => onChange(event.target.value)}
       />
     </label>
-  )
+  );
 }
 
 function TextArea({
@@ -279,11 +275,11 @@ function TextArea({
   required = false,
   onChange,
 }: {
-  label: string
-  value: string
-  placeholder?: string
-  required?: boolean
-  onChange: (value: string) => void
+  label: string;
+  value: string;
+  placeholder?: string;
+  required?: boolean;
+  onChange: (value: string) => void;
 }) {
   return (
     <label className="block">
@@ -300,15 +296,15 @@ function TextArea({
         onChange={(event) => onChange(event.target.value)}
       />
     </label>
-  )
+  );
 }
 
 function PricingPreview({
   page,
   updatePage,
 }: {
-  page: SubscriptionPage
-  updatePage: (recipe: (page: SubscriptionPage) => SubscriptionPage) => void
+  page: SubscriptionPage;
+  updatePage: (recipe: (page: SubscriptionPage) => SubscriptionPage) => void;
 }) {
   const updateTier = (id: string, patch: Partial<Tier>) => {
     updatePage((current) => ({
@@ -316,26 +312,26 @@ function PricingPreview({
       tiers: current.tiers.map((tier) =>
         tier.id === id ? { ...tier, ...patch } : tier,
       ),
-    }))
-  }
+    }));
+  };
 
   const addTier = () => {
     updatePage((current) => ({
       ...current,
       tiers: [...current.tiers, createEmptyTier()],
-    }))
-  }
+    }));
+  };
 
   const removeTier = (id: string) => {
     updatePage((current) => ({
       ...current,
       tiers: current.tiers.filter((tier) => tier.id !== id),
-    }))
-  }
+    }));
+  };
 
   const renderTierEditor = (tier: Tier, index: number) => {
     const placeholders =
-      tierPlaceholders[index] ?? tierPlaceholders[tierPlaceholders.length - 1]
+      tierPlaceholders[index] ?? tierPlaceholders[tierPlaceholders.length - 1];
 
     return (
       <article
@@ -383,7 +379,7 @@ function PricingPreview({
               <input
                 className="min-w-0 flex-1 border-0 bg-transparent text-base font-black outline-none"
                 type="number"
-                value={tier.price > 0 ? String(tier.price) : ''}
+                value={tier.price > 0 ? String(tier.price) : ""}
                 placeholder={placeholders.price}
                 onChange={(event) =>
                   updateTier(tier.id, { price: Number(event.target.value) })
@@ -405,8 +401,8 @@ function PricingPreview({
           />
         </label>
       </article>
-    )
-  }
+    );
+  };
 
   return (
     <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-(--line) bg-white xl:max-h-[calc(100vh-8rem)]">
@@ -432,5 +428,5 @@ function PricingPreview({
         {page.tiers.map(renderTierEditor)}
       </div>
     </section>
-  )
+  );
 }

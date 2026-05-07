@@ -1,11 +1,11 @@
-import { Link } from '@tanstack/react-router'
-import { LogOut } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import delta_pay_logo from '@/assets/deltapay.png'
-import { useMerchantAuth } from './merchantAuth'
+import { Link } from "@tanstack/react-router";
+import { LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import delta_pay_logo from "@/assets/deltapay.png";
+import { useMerchantAuth } from "./merchantAuth";
 
 export default function Header() {
-  const { authenticated, logout, ready } = useMerchantAuth()
+  const { authenticated, logout, ready } = useMerchantAuth();
 
   return (
     <header className="sticky h-20 top-0 z-50 border-b bg-white border-black px-4">
@@ -15,7 +15,7 @@ export default function Header() {
             to="/"
             className="inline-flex items-center gap-2 text-black no-underline"
           >
-            <img src={delta_pay_logo} alt="Delta Pay" className='h-20'/>
+            <img src={delta_pay_logo} alt="Delta Pay" className="h-20" />
             Delta Pay
           </Link>
         </h2>
@@ -46,5 +46,5 @@ export default function Header() {
         </div>
       </nav>
     </header>
-  )
+  );
 }
