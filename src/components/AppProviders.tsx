@@ -29,7 +29,7 @@ export default function AppProviders({ children }: { children: ReactNode }) {
           logo: undefined,
           showWalletLoginFirst: true,
           walletChainType: 'solana-only',
-          walletList: ['detected_solana_wallets', 'wallet_connect_qr_solana'],
+          walletList: ['phantom', 'metamask', 'backpack', 'detected_solana_wallets'],
         },
         externalWallets: {
           solana: {

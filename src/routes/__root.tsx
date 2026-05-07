@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import { ArrowLeft, Home, Plus, SearchX } from 'lucide-react'
+import { Home, Plus, SearchX } from 'lucide-react'
 import AppProviders from '../components/AppProviders'
 import { Button } from '../components/ui/button'
 import Footer from '../components/Footer'
