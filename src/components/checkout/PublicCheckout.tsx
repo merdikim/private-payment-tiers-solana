@@ -1,5 +1,5 @@
-import { Check, ShieldCheck, Wallet } from 'lucide-react'
-import { useState } from 'react'
+import { Check, LogOut, ShieldCheck, Wallet } from 'lucide-react'
+import { useState, type ReactNode } from 'react'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { Button } from '@/components/ui/button'
 import type {
@@ -10,6 +10,7 @@ import type { SubscriptionPage, Tier } from '@/lib/subscriptionPage'
 
 type PublicCheckoutProps = {
   customerWalletAddress?: string
+  disconnectWallet: () => Promise<void>
   isCustomerWalletReady: boolean
   isWalletConnecting: boolean
   merchantWalletAddress: string
@@ -21,6 +22,7 @@ type PublicCheckoutProps = {
 
 export function PublicCheckout({
   customerWalletAddress,
+  disconnectWallet,
   isCustomerWalletReady,
   isWalletConnecting,
   merchantWalletAddress,
@@ -68,6 +70,7 @@ export function PublicCheckout({
           accentColor={page.accentColor}
           currency={page.currency}
           customerWalletAddress={customerWalletAddress}
+          disconnectWallet={disconnectWallet}
           isCustomerWalletReady={isCustomerWalletReady}
           isWalletConnecting={isWalletConnecting}
           merchantWalletAddress={merchantWalletAddress}
@@ -149,6 +152,7 @@ function OrderSummary({
   accentColor,
   currency,
   customerWalletAddress,
+  disconnectWallet,
   isCustomerWalletReady,
   isWalletConnecting,
   merchantWalletAddress,
@@ -160,6 +164,7 @@ function OrderSummary({
   accentColor: string
   currency: string
   customerWalletAddress?: string
+  disconnectWallet: () => Promise<void>
   isCustomerWalletReady: boolean
   isWalletConnecting: boolean
   merchantWalletAddress: string
@@ -218,7 +223,22 @@ function OrderSummary({
 
           <div className="mt-4 grid gap-2 text-sm">
             <CheckoutDetail label="Payment" value="Private USDC via Cloak" />
-            <CheckoutDetail
+            <CheckoutDetailWithAction
+              action={
+                isCustomerWalletReady ? (
+                  <Button
+                    type="button"
+                    aria-label="Disconnect wallet"
+                    title="Disconnect wallet"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 rounded-md text-(--sea-ink-soft) hover:text-(--sea-ink)"
+                    onClick={() => void disconnectWallet()}
+                  >
+                    <LogOut size={14} aria-hidden="true" />
+                  </Button>
+                ) : null
+              }
               label="Wallet"
               value={formatWalletAddress(customerWalletAddress)}
             />
@@ -287,6 +307,30 @@ function CheckoutDetail({ label, value }: { label: string; value: string }) {
   )
 }
 
+function CheckoutDetailWithAction({
+  action,
+  label,
+  value,
+}: {
+  action: ReactNode
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex min-h-9 items-center justify-between gap-3 rounded-md border border-(--line) bg-(--surface-muted) px-3">
+      <span className="text-xs font-black uppercase text-(--sea-ink-soft)">
+        {label}
+      </span>
+      <span className="flex min-w-0 items-center justify-end gap-1">
+        <span className="min-w-0 truncate text-right font-black text-(--sea-ink)">
+          {value}
+        </span>
+        {action}
+      </span>
+    </div>
+  )
+}
+
 function formatWalletAddress(address?: string) {
   if (!address) {
     return 'Not connected'
@@ -348,9 +392,18 @@ function PaymentMessage({ payment }: { payment: PaymentState }) {
 
   if (payment.status === 'error' && payment.error) {
     return (
-      <p className="mb-0 mt-3 text-xs font-semibold text-red-700">
-        {payment.error}
-      </p>
+      <div className="mt-3 rounded-md border border-red-700 bg-red-50 px-3 py-2 text-xs font-semibold leading-5 text-red-800">
+        <p className="m-0 font-black">
+          {payment.errorTitle ?? 'Payment failed'}
+        </p>
+        <p className="mb-0 mt-1">{payment.error}</p>
+        {payment.errorSuggestion ? (
+          <p className="mb-0 mt-1 text-red-700">{payment.errorSuggestion}</p>
+        ) : null}
+        {payment.errorRecoverable ? (
+          <p className="mb-0 mt-1 text-red-700">You can try again.</p>
+        ) : null}
+      </div>
     )
   }
 

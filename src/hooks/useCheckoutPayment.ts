@@ -13,7 +13,7 @@ import type { SubscriptionPage, Tier } from '@/lib/subscriptionPage'
 import {
   SOLANA_RPC_URLS,
   USDC_MINT_ADDRESS,
-  getPaymentErrorMessage,
+  getPaymentErrorDetails,
   sendPrivateUsdcPayment,
 } from '@/lib/solanaCheckout'
 
@@ -25,11 +25,15 @@ export type PaymentStatus =
   | 'error'
 
 export type PaymentState = {
+  errorCategory?: 'wallet' | 'network' | 'validation' | 'service' | 'transaction' | 'unknown'
+  errorTitle?: string
   tierId?: string
   status: PaymentStatus
   message?: string
   signature?: string
   error?: string
+  errorRecoverable?: boolean
+  errorSuggestion?: string
 }
 
 export type UsdcBalanceState = {
@@ -43,6 +47,7 @@ export function useCheckoutPayment(page: SubscriptionPage) {
   const {
     connected,
     connecting,
+    disconnect,
     publicKey,
     signMessage,
     signTransaction,
@@ -60,6 +65,12 @@ export function useCheckoutPayment(page: SubscriptionPage) {
   const isCustomerWalletReady = Boolean(
     connected && customerWalletAddress && wallet && signTransaction,
   )
+
+  useEffect(() => {
+    if (!connected) {
+      setPayment({ status: 'idle' })
+    }
+  }, [connected])
 
   useEffect(() => {
     if (!connected || !publicKey) {
@@ -185,16 +196,23 @@ export function useCheckoutPayment(page: SubscriptionPage) {
         signature,
       })
     } catch (error) {
+      const paymentError = getPaymentErrorDetails(error)
+
       setPayment({
         tierId: tier.id,
         status: 'error',
-        error: getPaymentErrorMessage(error),
+        error: paymentError.message,
+        errorCategory: paymentError.category,
+        errorRecoverable: paymentError.recoverable,
+        errorSuggestion: paymentError.suggestion,
+        errorTitle: paymentError.title,
       })
     }
   }
 
   return {
     customerWalletAddress,
+    disconnectWallet: disconnect,
     isCustomerWalletReady,
     isWalletConnecting: connecting,
     merchantWalletAddress,
