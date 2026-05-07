@@ -68,13 +68,7 @@ function NotFoundPage() {
             <Button asChild variant="outline">
               <Link to="/new" className="no-underline">
                 <Plus size={16} aria-hidden="true" />
-                New USDC pricing
-              </Link>
-            </Button>
-            <Button asChild variant="ghost">
-              <Link to="/" className="no-underline">
-                <ArrowLeft size={16} aria-hidden="true" />
-                Home
+                Create New Checkout Page
               </Link>
             </Button>
           </div>

@@ -84,7 +84,7 @@ export function normalizeSubscriptionPage(page: SubscriptionPage): SubscriptionP
   return {
     ...draftSubscriptionPage,
     ...page,
-    slug: createSlugFromBusinessName(page.businessName),
+    slug: createSlugFromBusinessName(page.businessName) || page.slug.trim(),
     currency: '$',
     tiers: page.tiers.map((tier) => ({
       ...tier,
@@ -99,6 +99,32 @@ export function getIncompleteTierNumbers(page: SubscriptionPage) {
 
     return isComplete ? [] : [index + 1]
   })
+}
+
+export function selectSubscriptionPageTier(
+  page: SubscriptionPage,
+  tier?: string,
+): SubscriptionPage | undefined {
+  const tierKey = tier?.trim()
+
+  if (!tierKey) {
+    return page
+  }
+
+  const tierNumber = Number(tierKey)
+  const selectedTier =
+    Number.isInteger(tierNumber) && tierNumber > 0
+      ? page.tiers[tierNumber - 1]
+      : page.tiers.find((item) => item.id === tierKey)
+
+  if (!selectedTier) {
+    return undefined
+  }
+
+  return {
+    ...page,
+    tiers: [selectedTier],
+  }
 }
 
 export function assertSubscriptionPageCanBeSaved(page: SubscriptionPage) {
@@ -147,13 +173,13 @@ export const getSubscriptionPage = createServerFn({ method: 'GET' })
   })
 
 export const findSubscriptionPage = createServerFn({ method: 'GET' })
-  .inputValidator((data: { slug: string }) => data)
+  .inputValidator((data: { slug: string; tier?: string }) => data)
   .handler(async ({ data }) => {
     const { findSubscriptionPageInDatabase } = await import(
       './subscriptionPage.server'
     )
 
-    return findSubscriptionPageInDatabase(data.slug)
+    return findSubscriptionPageInDatabase(data.slug, data.tier)
   })
 
 export const saveSubscriptionPage = createServerFn({ method: 'POST' })
@@ -169,5 +195,5 @@ export const saveSubscriptionPage = createServerFn({ method: 'POST' })
   })
 
 export function getPublicPagePath(slug: string) {
-  return `/pages/${slug}`
+  return `/business/${slug}`
 }

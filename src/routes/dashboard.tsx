@@ -1,19 +1,24 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useServerFn } from '@tanstack/react-start'
 import { useEffect, useState, type ReactNode } from 'react'
 import {
-  Copy,
   BadgeDollarSign,
+  Copy,
   ExternalLink,
   FilePlus2,
   Link as LinkIcon,
   LoaderCircle,
+  Pencil,
   Plus,
   ReceiptText,
+  Save,
+  Trash2,
   Wallet,
+  X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast'
 import {
   PAYMENTS_QUERY_KEY,
   type CheckoutPayment,
@@ -22,15 +27,21 @@ import {
 import {
   PAGES_QUERY_KEY,
   type SubscriptionPage,
+  type Tier,
+  createEmptyTier,
   getPublicPagePath,
   listSubscriptionPages,
+  saveSubscriptionPage,
 } from '../lib/subscriptionPage'
 
 export const Route = createFileRoute('/dashboard')({ component: Dashboard })
 
 function Dashboard() {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
   const listSubscriptionPagesFn = useServerFn(listSubscriptionPages)
   const listCheckoutPaymentsFn = useServerFn(listCheckoutPayments)
+  const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage)
   const { data: pages = [], isPending } = useQuery({
     queryKey: PAGES_QUERY_KEY,
     queryFn: () => listSubscriptionPagesFn(),
@@ -55,6 +66,47 @@ function Dashboard() {
   const [selectedSlug, setSelectedSlug] = useState('')
   const selectedPage =
     activePages.find((page) => page.slug === selectedSlug) ?? activePages[0]
+  const savePage = useMutation({
+    mutationFn: (nextPage: SubscriptionPage) =>
+      saveSubscriptionPageFn({ data: nextPage }),
+    onSuccess: async (nextPage, savedDraft) => {
+      queryClient.setQueryData<SubscriptionPage[]>(
+        PAGES_QUERY_KEY,
+        (currentPages) => {
+          if (!currentPages) {
+            return [nextPage]
+          }
+
+          let replacedSavedPage = false
+          const updatedPages = currentPages.map((page) => {
+            if (page.slug === savedDraft.slug || page.slug === nextPage.slug) {
+              replacedSavedPage = true
+              return nextPage
+            }
+
+            return page
+          })
+
+          return replacedSavedPage ? updatedPages : [nextPage, ...updatedPages]
+        },
+      )
+      setSelectedSlug(nextPage.slug)
+      await queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY })
+      toast({
+        title: 'Checkout page updated',
+        description: `${nextPage.businessName} has been saved.`,
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: 'Checkout was not saved',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Check the required fields and try again.',
+      })
+    },
+  })
 
   useEffect(() => {
     if (!activePages.length) {
@@ -140,6 +192,12 @@ function Dashboard() {
                 value={String(successfulPayments)}
               />
             </div>
+
+            <ProjectEditor
+              page={selectedPage}
+              isSaving={savePage.isPending}
+              onSave={(nextPage) => savePage.mutate(nextPage)}
+            />
 
             <section className="island-shell rounded-lg p-4">
               <div className="mb-4 flex items-center justify-between gap-3">
@@ -256,6 +314,236 @@ function ProjectSidebar({
   )
 }
 
+function ProjectEditor({
+  page,
+  isSaving,
+  onSave,
+}: {
+  page: SubscriptionPage
+  isSaving: boolean
+  onSave: (page: SubscriptionPage) => void
+}) {
+  const [draft, setDraft] = useState(page)
+  const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    setDraft(page)
+    setIsOpen(false)
+  }, [page])
+
+  const updateDraft = (recipe: (page: SubscriptionPage) => SubscriptionPage) => {
+    setDraft((current) => recipe(current))
+  }
+
+  const updateTier = (id: string, patch: Partial<Tier>) => {
+    updateDraft((current) => ({
+      ...current,
+      tiers: current.tiers.map((tier) =>
+        tier.id === id ? { ...tier, ...patch } : tier,
+      ),
+    }))
+  }
+
+  const addTier = () => {
+    updateDraft((current) => ({
+      ...current,
+      tiers: [...current.tiers, createEmptyTier()],
+    }))
+  }
+
+  const removeTier = (id: string) => {
+    updateDraft((current) => ({
+      ...current,
+      tiers:
+        current.tiers.length <= 1
+          ? current.tiers
+          : current.tiers.filter((tier) => tier.id !== id),
+    }))
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className="island-shell flex w-full items-center justify-between gap-4 rounded-lg p-4 text-left hover:bg-(--surface-muted)"
+        onClick={() => setIsOpen(true)}
+      >
+        <span className="min-w-0">
+          <span className="mb-1 flex items-center gap-2 text-base font-black text-(--sea-ink)">
+            <Pencil size={17} aria-hidden="true" />
+            Edit checkout page
+          </span>
+          <span className="block text-sm leading-6 text-(--sea-ink-soft)">
+            Update business details and pricing tiers.
+          </span>
+        </span>
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-black bg-white">
+          <Pencil size={16} aria-hidden="true" />
+        </span>
+      </button>
+
+      {isOpen ? (
+        <div
+          className="fixed inset-0 z-100 grid place-items-center overflow-y-auto bg-black/35 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="project-editor-title"
+        >
+          <section className="island-shell my-6 max-h-[calc(100vh-3rem)] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-4 sm:p-5">
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <div>
+                <p className="island-kicker mb-2">Edit checkout</p>
+                <h2
+                  id="project-editor-title"
+                  className="m-0 text-2xl font-black text-(--sea-ink)"
+                >
+                  {page.businessName}
+                </h2>
+              </div>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                title="Close editor"
+                onClick={() => setIsOpen(false)}
+              >
+                <X size={16} aria-hidden="true" />
+                <span className="sr-only">Close editor</span>
+              </Button>
+            </div>
+
+            <div className="mb-4 flex items-center justify-end gap-3 border-b border-(--line) pb-4">
+              <Button
+                type="button"
+                disabled={isSaving}
+                onClick={() => onSave(draft)}
+              >
+                <Save size={15} aria-hidden="true" />
+                {isSaving ? 'Saving...' : 'Save changes'}
+              </Button>
+            </div>
+
+            <div className="grid gap-3">
+              <label className="block">
+                <span className="field-label">
+                  Business name <span aria-hidden="true">*</span>
+                </span>
+                <input
+                  className="field-input field-input-compact"
+                  value={draft.businessName}
+                  onChange={(event) =>
+                    updateDraft((current) => ({
+                      ...current,
+                      businessName: event.target.value,
+                    }))
+                  }
+                />
+              </label>
+
+              <label className="block">
+                <span className="field-label">Headline</span>
+                <textarea
+                  className="field-input min-h-20 resize-y leading-6"
+                  value={draft.headline}
+                  onChange={(event) =>
+                    updateDraft((current) => ({
+                      ...current,
+                      headline: event.target.value,
+                    }))
+                  }
+                />
+              </label>
+            </div>
+
+            <div className="my-4 border-t border-(--line)" />
+
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h3 className="m-0 text-sm font-black text-(--sea-ink)">Tiers</h3>
+              <Button type="button" size="sm" variant="outline" onClick={addTier}>
+                <Plus size={15} aria-hidden="true" />
+                Add tier
+              </Button>
+            </div>
+
+            <div className="grid gap-3">
+              {draft.tiers.map((tier, index) => (
+                <article
+                  key={tier.id}
+                  className="rounded-md border border-(--line) bg-white p-3"
+                >
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <p className="m-0 text-sm font-black text-(--sea-ink)">
+                      Tier {index + 1}
+                    </p>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      className="h-8 w-8"
+                      title="Delete tier"
+                      disabled={draft.tiers.length <= 1}
+                      onClick={() => removeTier(tier.id)}
+                    >
+                      <Trash2 size={14} aria-hidden="true" />
+                      <span className="sr-only">Delete tier</span>
+                    </Button>
+                  </div>
+
+                  <div className="grid gap-2 sm:grid-cols-[1fr_140px]">
+                    <label className="block">
+                      <span className="field-label">
+                        Item or service <span aria-hidden="true">*</span>
+                      </span>
+                      <input
+                        className="field-input field-input-compact"
+                        value={tier.name}
+                        onChange={(event) =>
+                          updateTier(tier.id, { name: event.target.value })
+                        }
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="field-label">
+                        Price <span aria-hidden="true">*</span>
+                      </span>
+                      <span className="flex min-h-10 items-center gap-1 rounded-md border border-black bg-white px-3">
+                        <span className="font-black">{draft.currency}</span>
+                        <input
+                          className="min-w-0 flex-1 border-0 bg-transparent text-base font-black outline-none"
+                          type="number"
+                          min="0"
+                          value={tier.price > 0 ? String(tier.price) : ''}
+                          onChange={(event) =>
+                            updateTier(tier.id, {
+                              price: Number(event.target.value),
+                            })
+                          }
+                        />
+                      </span>
+                    </label>
+                  </div>
+
+                  <label className="mt-2 block">
+                    <span className="field-label">Description</span>
+                    <input
+                      className="field-input field-input-compact"
+                      value={tier.description}
+                      onChange={(event) =>
+                        updateTier(tier.id, { description: event.target.value })
+                      }
+                    />
+                  </label>
+                </article>
+              ))}
+            </div>
+          </section>
+        </div>
+      ) : null}
+    </>
+  )
+}
+
 function ProjectDetails({
   page,
   payments,
@@ -297,7 +585,11 @@ function ProjectDetails({
           </div>
 
           <Button asChild variant="outline">
-            <a href={`/pages/${page.slug}`} target="_blank" rel="noopener noreferrer">
+            <a
+              href={getPublicPagePath(page.slug)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <ExternalLink size={16} aria-hidden="true" />
               Open
             </a>
@@ -344,28 +636,35 @@ function ProjectDetails({
       </article>
 
       <section className="overflow-hidden rounded-lg border border-black bg-white">
-        {page.tiers.map((tier) => (
-          <article
-            key={tier.id}
-            className="grid gap-2 border-b border-(--line) p-3 last:border-b-0 md:grid-cols-[1fr_130px] md:items-center"
-          >
-            <div className="min-w-0">
-              <h2 className="m-0 truncate text-base font-black text-(--sea-ink)">
-                {tier.name}
-              </h2>
-              {tier.description ? (
-                <p className="m-0 mt-0.5 line-clamp-2 text-xs leading-5 text-(--sea-ink-soft)">
-                  {tier.description}
-                </p>
-              ) : null}
-            </div>
+        {page.tiers.map((tier, index) => {
+          const tierUrl = `${publicUrl}?tier=${index + 1}`
 
-            <p className="m-0 text-xl font-black text-(--sea-ink) md:text-right">
-              {page.currency}
-              {tier.price}
-            </p>
-          </article>
-        ))}
+          return (
+            <a
+              key={tier.id}
+              href={tierUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="grid gap-2 border-b border-(--line) p-3 text-black no-underline last:border-b-0 hover:bg-(--surface-muted) md:grid-cols-[1fr_130px] md:items-center"
+            >
+              <div className="min-w-0">
+                <h2 className="m-0 truncate text-base font-black text-(--sea-ink)">
+                  {tier.name}
+                </h2>
+                {tier.description ? (
+                  <p className="m-0 mt-0.5 line-clamp-2 text-xs leading-5 text-(--sea-ink-soft)">
+                    {tier.description}
+                  </p>
+                ) : null}
+              </div>
+
+              <p className="m-0 text-xl font-black text-(--sea-ink) md:text-right">
+                {page.currency}
+                {tier.price}
+              </p>
+            </a>
+          )
+        })}
       </section>
     </section>
   )

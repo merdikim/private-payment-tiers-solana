@@ -5,6 +5,7 @@ import {
   type Tier,
   draftTiers,
   normalizeSubscriptionPage,
+  selectSubscriptionPageTier,
 } from './subscriptionPage'
 
 type StoredSubscriptionPage = Awaited<
@@ -64,7 +65,7 @@ export async function listSubscriptionPagesFromDatabase() {
   return pages.filter((page) => !isLegacyDefaultPage(page)).map(toSubscriptionPage)
 }
 
-export async function findSubscriptionPageInDatabase(slug: string) {
+export async function findSubscriptionPageInDatabase(slug: string, tier?: string) {
   const page = await prisma.subscriptionPage.findUnique({
     where: { slug },
   })
@@ -73,7 +74,7 @@ export async function findSubscriptionPageInDatabase(slug: string) {
     return undefined
   }
 
-  return toSubscriptionPage(page)
+  return selectSubscriptionPageTier(toSubscriptionPage(page), tier)
 }
 
 export async function getSubscriptionPageFromDatabase(slug?: string) {
@@ -93,7 +94,34 @@ export async function getSubscriptionPageFromDatabase(slug?: string) {
 }
 
 export async function saveSubscriptionPageToDatabase(page: SubscriptionPage) {
+  const previousSlug = page.slug.trim()
   const nextPage = normalizeSubscriptionPage(page)
+  const existingPage =
+    previousSlug && previousSlug !== nextPage.slug
+      ? await prisma.subscriptionPage.findUnique({
+          where: { slug: previousSlug },
+        })
+      : null
+
+  if (existingPage && !isLegacyDefaultPage(existingPage)) {
+    const savedPage = await prisma.subscriptionPage.update({
+      where: { slug: previousSlug },
+      data: {
+        slug: nextPage.slug,
+        businessName: nextPage.businessName,
+        headline: nextPage.headline,
+        subheadline: nextPage.subheadline,
+        accentColor: nextPage.accentColor,
+        backgroundColor: nextPage.backgroundColor,
+        currency: '$',
+        checkoutUrl: nextPage.checkoutUrl,
+        walletAddress: nextPage.walletAddress,
+        tiers: nextPage.tiers,
+      },
+    })
+
+    return toSubscriptionPage(savedPage)
+  }
 
   const savedPage = await prisma.subscriptionPage.upsert({
     where: { slug: nextPage.slug },

@@ -6,6 +6,7 @@ import {
   getIncompleteTierNumbers,
   getPublicPagePath,
   normalizeSubscriptionPage,
+  selectSubscriptionPageTier,
 } from './subscriptionPage'
 
 describe('subscription page helpers', () => {
@@ -20,7 +21,9 @@ describe('subscription page helpers', () => {
       price: 49,
       features: [],
     })
-    expect(getPublicPagePath('acme-analytics')).toBe('/pages/acme-analytics')
+    expect(getPublicPagePath('acme-analytics')).toBe(
+      '/business/acme-analytics',
+    )
   })
 
   it('generates slugs from business names', () => {
@@ -44,6 +47,16 @@ describe('subscription page helpers', () => {
     })
   })
 
+  it('keeps the slug aligned to edited business names', () => {
+    expect(
+      normalizeSubscriptionPage({
+        ...draftSubscriptionPage,
+        slug: 'old-name',
+        businessName: 'New Checkout Name',
+      }).slug,
+    ).toBe('new-checkout-name')
+  })
+
   it('reports tiers missing required content', () => {
     expect(getIncompleteTierNumbers(draftSubscriptionPage)).toEqual([1, 2])
 
@@ -59,5 +72,24 @@ describe('subscription page helpers', () => {
         ],
       }),
     ).toEqual([])
+  })
+
+  it('selects a public tier by number or id', () => {
+    const page = {
+      ...draftSubscriptionPage,
+      tiers: [
+        { ...draftSubscriptionPage.tiers[0], id: 'consultation' },
+        { ...draftSubscriptionPage.tiers[1], id: 'package' },
+      ],
+    }
+
+    expect(selectSubscriptionPageTier(page, '1')?.tiers).toEqual([
+      page.tiers[0],
+    ])
+    expect(selectSubscriptionPageTier(page, 'package')?.tiers).toEqual([
+      page.tiers[1],
+    ])
+    expect(selectSubscriptionPageTier(page)?.tiers).toEqual(page.tiers)
+    expect(selectSubscriptionPageTier(page, '3')).toBeUndefined()
   })
 })

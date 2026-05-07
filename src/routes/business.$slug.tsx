@@ -11,9 +11,17 @@ import { useCheckoutPayment } from '@/hooks/useCheckoutPayment'
 import { SOLANA_RPC_URLS } from '@/lib/solanaCheckout'
 import { findSubscriptionPage } from '@/lib/subscriptionPage'
 
-export const Route = createFileRoute('/pages/$slug')({
-  loader: async ({ params }) => {
-    const page = await findSubscriptionPage({ data: { slug: params.slug } })
+export const Route = createFileRoute('/business/$slug')({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tier: typeof search.tier === 'string' ? search.tier : undefined,
+  }),
+  loaderDeps: ({ search }) => ({
+    tier: search.tier,
+  }),
+  loader: async ({ deps, params }) => {
+    const page = await findSubscriptionPage({
+      data: { slug: params.slug, tier: deps.tier },
+    })
 
     if (!page) {
       throw notFound()

@@ -13,7 +13,7 @@ import { Route as SigninRouteImport } from './routes/signin'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
+import { Route as BusinessSlugRouteImport } from './routes/business.$slug'
 
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
@@ -35,9 +35,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PagesSlugRoute = PagesSlugRouteImport.update({
-  id: '/pages/$slug',
-  path: '/pages/$slug',
+const BusinessSlugRoute = BusinessSlugRouteImport.update({
+  id: '/business/$slug',
+  path: '/business/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -46,14 +46,14 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/new': typeof NewRoute
   '/signin': typeof SigninRoute
-  '/pages/$slug': typeof PagesSlugRoute
+  '/business/$slug': typeof BusinessSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/new': typeof NewRoute
   '/signin': typeof SigninRoute
-  '/pages/$slug': typeof PagesSlugRoute
+  '/business/$slug': typeof BusinessSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,14 +61,14 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/new': typeof NewRoute
   '/signin': typeof SigninRoute
-  '/pages/$slug': typeof PagesSlugRoute
+  '/business/$slug': typeof BusinessSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/new' | '/signin' | '/pages/$slug'
+  fullPaths: '/' | '/dashboard' | '/new' | '/signin' | '/business/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/new' | '/signin' | '/pages/$slug'
-  id: '__root__' | '/' | '/dashboard' | '/new' | '/signin' | '/pages/$slug'
+  to: '/' | '/dashboard' | '/new' | '/signin' | '/business/$slug'
+  id: '__root__' | '/' | '/dashboard' | '/new' | '/signin' | '/business/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,7 +76,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   NewRoute: typeof NewRoute
   SigninRoute: typeof SigninRoute
-  PagesSlugRoute: typeof PagesSlugRoute
+  BusinessSlugRoute: typeof BusinessSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -109,11 +109,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pages/$slug': {
-      id: '/pages/$slug'
-      path: '/pages/$slug'
-      fullPath: '/pages/$slug'
-      preLoaderRoute: typeof PagesSlugRouteImport
+    '/business/$slug': {
+      id: '/business/$slug'
+      path: '/business/$slug'
+      fullPath: '/business/$slug'
+      preLoaderRoute: typeof BusinessSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -124,7 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   NewRoute: NewRoute,
   SigninRoute: SigninRoute,
-  PagesSlugRoute: PagesSlugRoute,
+  BusinessSlugRoute: BusinessSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
