@@ -162,7 +162,7 @@ export function useCheckoutPayment(page: SubscriptionPage) {
       })
 
       const { signature } = await sendPrivateUsdcPayment({
-        amountUsd: tier.price,
+        amountUsd: 0.02, //tier.price,
         merchantWalletAddress,
         onProgress: (message) =>
           setPayment({ tierId: tier.id, status: 'confirming', message }),

@@ -27,7 +27,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'USDC Checkout | Solana payment links',
+        title: 'Delta Pay | Crypto payment for any business',
       },
     ],
     links: [

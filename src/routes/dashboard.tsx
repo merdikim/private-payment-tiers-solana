@@ -72,19 +72,12 @@ function Dashboard() {
       <section className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="island-kicker mb-2">Dashboard</p>
-          {/* <h1 className="mb-3 max-w-4xl text-3xl font-bold tracking-tight text-(--sea-ink) sm:text-5xl">
-            Hosted Solana USDC checkouts.
-          </h1>
-          <p className="max-w-3xl text-base leading-7 text-(--sea-ink-soft)">
-            Review each merchant checkout, copy its hosted payment link, and
-            keep receiving wallets close at hand.
-          </p> */}
         </div>
 
         <Button asChild>
           <Link to="/new" className="no-underline">
             <Plus size={16} aria-hidden="true" />
-            New USDC pricing
+            Create New Checkout Page
           </Link>
         </Button>
       </section>
@@ -109,7 +102,7 @@ function Dashboard() {
             <Button asChild>
               <Link to="/new" className="no-underline">
                 <Plus size={16} aria-hidden="true" />
-                Create USDC pricing
+                Create New Checkout Page
               </Link>
             </Button>
           </div>

@@ -28,10 +28,6 @@ export const USDC_MINT_ADDRESS =
     .trim()
     .replace(/^['"]|['"]$/g, '') ||
   'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-const CLOAK_RELAY_URL =
-  String(import.meta.env.VITE_CLOAK_RELAY_URL ?? '')
-    .trim()
-    .replace(/^['"]|['"]$/g, '') || undefined
 
 export const SOLANA_RPC_URLS = Array.from(
   new Set(

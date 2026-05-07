@@ -25,15 +25,14 @@ function SignInPage() {
   }, [authenticated, navigate, ready])
 
   return (
-    <main className="page-wrap flex min-h-[calc(100vh-190px)] items-center justify-center px-4 py-10">
+    <main className="page-wrap flex min-h-[calc(100vh-230px)] items-center justify-center px-4 py-10">
       <section className="island-shell w-full max-w-md rounded-lg p-6 sm:p-8">
         <p className="island-kicker mb-3">Merchant access</p>
         <h1 className="m-0 text-3xl font-black tracking-tight text-black">
-          Sign in to USDC Checkout.
+          Sign in to Delta Pay.
         </h1>
         <p className="mt-4 text-sm leading-6 text-neutral-700">
-          Manage business pricing tiers, checkout links, and Solana USDC wallet
-          settings.
+          create and manage checkout pages, business pricing tiers and checkout links.
         </p>
 
         <div className="mt-7 grid gap-3">

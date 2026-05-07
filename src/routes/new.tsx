@@ -29,7 +29,7 @@ export const Route = createFileRoute('/new')({
 
 const pagePlaceholders = {
   businessName: 'Business name',
-  headline: 'USDC pricing for your items or services.',
+  headline: 'Your service/business description',
 }
 
 const tierPlaceholders = [
@@ -152,18 +152,18 @@ function NewCheckoutPage() {
       <section className="mb-6">
         <div>
           <h1 className="mb-3 max-w-4xl text-xxl font-bold tracking-tight text-(--sea-ink) sm:text-3xl">
-            Create USDC pricing for a business.
+            New Checkout page for your business.
           </h1>
           <p className="max-w-3xl text-base leading-7 text-(--sea-ink-soft)">
             Create a pricing tier for each item, package, or service customers
-            can pay for with a Solana wallet.
+            can pay for.
           </p>
         </div>
       </section>
 
       <section className="grid items-start gap-5 xl:grid-cols-[410px_1fr]">
         <div className="xl:sticky xl:top-24">
-          <Panel title="Business pricing" icon={<LinkIcon size={17} />}>
+          <Panel title="Business Information" icon={<LinkIcon size={17} />}>
             <Field
               label="Business name"
               value={page.businessName}
@@ -193,7 +193,7 @@ function NewCheckoutPage() {
                 onClick={publishPage}
               >
                 <Save size={15} aria-hidden="true" />
-                {savePage.isPending ? 'Publishing...' : 'Publish USDC pricing'}
+                {savePage.isPending ? 'Publishing...' : 'Publish checkout page'}
               </Button>
             </div>
           </Panel>
@@ -353,7 +353,9 @@ function PricingPreview({
 
         <div className="grid gap-2 lg:grid-cols-[1fr_150px]">
           <label className="block">
-            <span className="field-label">Item or service</span>
+            <span className="field-label">
+              Item or service <span aria-hidden="true">*</span>
+            </span>
             <input
               className="field-input field-input-compact"
               value={tier.name}
@@ -365,7 +367,9 @@ function PricingPreview({
           </label>
 
           <label className="block">
-            <span className="field-label">Price</span>
+            <span className="field-label">
+              Price <span aria-hidden="true">*</span>
+            </span>
             <span className="flex min-h-10 items-center gap-1 rounded-md border border-black bg-white px-3">
               <span className="font-black">{page.currency}</span>
               <input
@@ -401,10 +405,10 @@ function PricingPreview({
       <div className="shrink-0 border-t-5 border-black bg-white p-5">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
           <div>
-            <p className="m-0 text-sm font-bold text-black">
+            <p className="m-0 text-2xl font-bold text-black">
               {page.businessName || pagePlaceholders.businessName}
             </p>
-            <h2 className="mb-2 mt-2 max-w-3xl text-2xl font-bold text-slate-950">
+            <h2 className="mb-2 mt-2 max-w-3xl text-sm font-bold text-slate-950">
               {page.headline || pagePlaceholders.headline}
             </h2>
           </div>
