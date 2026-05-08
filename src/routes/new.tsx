@@ -17,7 +17,9 @@ import {
   getIncompleteTierNumbers,
   saveSubscriptionPage,
   subscriptionPagesQueryKey,
+  uploadImage,
 } from "../lib/subscriptionPage";
+import PhotoPicker from "#/components/PhotoCardPicker";
 
 export const Route = createFileRoute("/new")({
   component: NewCheckoutPageRoute,
@@ -76,7 +78,9 @@ function NewCheckoutPage() {
     walletReady: merchantWalletReady,
   } = useMerchantAuth();
   const saveSubscriptionPageFn = useServerFn(saveSubscriptionPage);
+  const uploadImageFn = useServerFn(uploadImage);
   const [page, setPage] = useState<SubscriptionPage>(() => createBlankPage());
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const savePage = useMutation({
     mutationFn: (nextPage: SubscriptionPage) =>
@@ -107,7 +111,7 @@ function NewCheckoutPage() {
     setPage((current) => recipe(current));
   };
 
-  const publishPage = () => {
+  const publishPage = async () => {
     const pageToSave = {
       ...page,
       walletAddress: merchantWalletAddress,
@@ -164,6 +168,25 @@ function NewCheckoutPage() {
       return;
     }
 
+    // Upload image if selected
+    if (selectedFile) {
+      try {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        const imageUrl = await uploadImageFn({ data: formData });
+        pageToSave.imageUrl = imageUrl;
+      } catch (error) {
+        toast({
+          title: "Image upload failed",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Could not upload image. Please try again.",
+        });
+        return;
+      }
+    }
+
     savePage.mutate(pageToSave);
   };
 
@@ -205,6 +228,11 @@ function NewCheckoutPage() {
                 updatePage((current) => ({ ...current, headline }))
               }
             />
+            <div>
+              <PhotoPicker
+                onFileSelected={(file) => setSelectedFile(file)}
+              />
+            </div>
             <div className="border-t border-(--line) pt-3">
               <Button
                 type="button"

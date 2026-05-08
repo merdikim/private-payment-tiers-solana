@@ -17,6 +17,7 @@ model SubscriptionPage {
   currency        String   @default("$")
   checkoutUrl     String   @map("checkout_url")
   walletAddress   String   @default("") @map("wallet_address")
+  imageUrl        String?  @map("image_url")
   tiers           Json
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")

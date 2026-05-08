@@ -20,6 +20,7 @@ export type SubscriptionPage = {
   currency: string;
   checkoutUrl: string;
   walletAddress: string;
+  imageUrl?: string;
   tiers: Tier[];
 };
 
@@ -60,6 +61,7 @@ export const draftSubscriptionPage: SubscriptionPage = {
   currency: "$",
   checkoutUrl: "",
   walletAddress: "",
+  imageUrl: undefined,
   tiers: draftTiers,
 };
 
@@ -198,3 +200,21 @@ export const saveSubscriptionPage = createServerFn({ method: "POST" })
 export function getPublicPagePath(slug: string) {
   return `/business/${slug}`;
 }
+
+export const uploadImage = createServerFn({ method: "POST" })
+  .inputValidator((data: FormData) => data)
+  .handler(async ({ data }: { data: FormData }) => {
+    const file = data.get("file") as File;
+    if (!file) throw new Error("No file provided");
+
+    const { uploadR2Object } = await import("./cloudflareR2.server");
+
+    const key = `images/${Date.now()}-${file.name}`;
+    const uploaded = await uploadR2Object({
+      key,
+      body: new Uint8Array(await file.arrayBuffer()),
+      contentType: file.type,
+    });
+
+    return uploaded.url;
+  });

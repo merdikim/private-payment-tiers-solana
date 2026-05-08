@@ -57,6 +57,7 @@ function toSubscriptionPage(
     currency: page.currency,
     checkoutUrl: page.checkoutUrl,
     walletAddress: page.walletAddress,
+    imageUrl: page.imageUrl || undefined,
     tiers: parseTiers(page.tiers),
   });
 }
@@ -134,6 +135,7 @@ export async function saveSubscriptionPageToDatabase(page: SubscriptionPage) {
         currency: "$",
         checkoutUrl: nextPage.checkoutUrl,
         walletAddress: nextPage.walletAddress,
+        imageUrl: nextPage.imageUrl,
         tiers: nextPage.tiers,
       },
     });
@@ -153,6 +155,7 @@ export async function saveSubscriptionPageToDatabase(page: SubscriptionPage) {
       currency: "$",
       checkoutUrl: nextPage.checkoutUrl,
       walletAddress: nextPage.walletAddress,
+      imageUrl: nextPage.imageUrl,
       tiers: nextPage.tiers,
     },
     update: {
@@ -164,6 +167,7 @@ export async function saveSubscriptionPageToDatabase(page: SubscriptionPage) {
       currency: "$",
       checkoutUrl: nextPage.checkoutUrl,
       walletAddress: nextPage.walletAddress,
+      imageUrl: nextPage.imageUrl,
       tiers: nextPage.tiers,
     },
   });

@@ -7,6 +7,7 @@ import type {
   UsdcBalanceState,
 } from "@/hooks/useCheckoutPayment";
 import type { SubscriptionPage, Tier } from "@/lib/subscriptionPage";
+import delta_pay_logo from "@/assets/deltapay.png";
 
 type PublicCheckoutProps = {
   customerWalletAddress?: string;
@@ -92,10 +93,17 @@ function CheckoutHeader({ page }: { page: SubscriptionPage }) {
         {page.businessName}
       </h1>
       {page.headline ? (
-        <p className="mb-0 mt-4 max-w-2xl text-base leading-7 text-(--sea-ink-soft)">
+        <p className="mb-0 text-base leading-7 text-(--sea-ink-soft)">
           {page.headline}
         </p>
       ) : null}
+      <div className="flex justify-center">
+          <img
+            src={page.imageUrl ?? delta_pay_logo}
+            alt={page.businessName}
+            className="h-20 w-20 object-cover sm:h-40 sm:w-40"
+          />
+      </div>
     </div>
   );
 }
