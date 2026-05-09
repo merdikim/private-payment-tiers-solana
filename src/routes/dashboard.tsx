@@ -671,13 +671,23 @@ function ProjectDetails({
       </article>
 
       <section className="overflow-hidden rounded-lg border border-black bg-white">
-        {page.tiers.map((tier, index) => {
-          const tierUrl = `${publicUrl}?tier=${index + 1}`;
+        {page.tiers.map((tier) => {
+      
 
           return (
-            <a
+            <Link
               key={tier.id}
-              href={tierUrl}
+              to="/business/$slug"
+              params={
+                {
+                  slug: page.slug
+                }
+              }
+              search={
+                {
+                  tier:tier.id
+                }
+              }
               target="_blank"
               rel="noopener noreferrer"
               className="grid gap-2 border-b border-(--line) p-3 text-black no-underline last:border-b-0 hover:bg-(--surface-muted) md:grid-cols-[1fr_130px] md:items-center"
@@ -697,7 +707,7 @@ function ProjectDetails({
                 {page.currency}
                 {tier.price}
               </p>
-            </a>
+            </Link>
           );
         })}
       </section>

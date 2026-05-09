@@ -28,7 +28,6 @@ export type SubscriptionPageMinAggregateOutputType = {
   slug: string | null
   businessName: string | null
   headline: string | null
-  subheadline: string | null
   accentColor: string | null
   backgroundColor: string | null
   currency: string | null
@@ -43,7 +42,6 @@ export type SubscriptionPageMaxAggregateOutputType = {
   slug: string | null
   businessName: string | null
   headline: string | null
-  subheadline: string | null
   accentColor: string | null
   backgroundColor: string | null
   currency: string | null
@@ -58,7 +56,6 @@ export type SubscriptionPageCountAggregateOutputType = {
   slug: number
   businessName: number
   headline: number
-  subheadline: number
   accentColor: number
   backgroundColor: number
   currency: number
@@ -76,7 +73,6 @@ export type SubscriptionPageMinAggregateInputType = {
   slug?: true
   businessName?: true
   headline?: true
-  subheadline?: true
   accentColor?: true
   backgroundColor?: true
   currency?: true
@@ -91,7 +87,6 @@ export type SubscriptionPageMaxAggregateInputType = {
   slug?: true
   businessName?: true
   headline?: true
-  subheadline?: true
   accentColor?: true
   backgroundColor?: true
   currency?: true
@@ -106,7 +101,6 @@ export type SubscriptionPageCountAggregateInputType = {
   slug?: true
   businessName?: true
   headline?: true
-  subheadline?: true
   accentColor?: true
   backgroundColor?: true
   currency?: true
@@ -195,7 +189,6 @@ export type SubscriptionPageGroupByOutputType = {
   slug: string
   businessName: string
   headline: string
-  subheadline: string
   accentColor: string
   backgroundColor: string
   currency: string
@@ -232,7 +225,6 @@ export type SubscriptionPageWhereInput = {
   slug?: Prisma.StringFilter<"SubscriptionPage"> | string
   businessName?: Prisma.StringFilter<"SubscriptionPage"> | string
   headline?: Prisma.StringFilter<"SubscriptionPage"> | string
-  subheadline?: Prisma.StringFilter<"SubscriptionPage"> | string
   accentColor?: Prisma.StringFilter<"SubscriptionPage"> | string
   backgroundColor?: Prisma.StringFilter<"SubscriptionPage"> | string
   currency?: Prisma.StringFilter<"SubscriptionPage"> | string
@@ -249,7 +241,6 @@ export type SubscriptionPageOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   businessName?: Prisma.SortOrder
   headline?: Prisma.SortOrder
-  subheadline?: Prisma.SortOrder
   accentColor?: Prisma.SortOrder
   backgroundColor?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -269,7 +260,6 @@ export type SubscriptionPageWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.SubscriptionPageWhereInput | Prisma.SubscriptionPageWhereInput[]
   businessName?: Prisma.StringFilter<"SubscriptionPage"> | string
   headline?: Prisma.StringFilter<"SubscriptionPage"> | string
-  subheadline?: Prisma.StringFilter<"SubscriptionPage"> | string
   accentColor?: Prisma.StringFilter<"SubscriptionPage"> | string
   backgroundColor?: Prisma.StringFilter<"SubscriptionPage"> | string
   currency?: Prisma.StringFilter<"SubscriptionPage"> | string
@@ -286,7 +276,6 @@ export type SubscriptionPageOrderByWithAggregationInput = {
   slug?: Prisma.SortOrder
   businessName?: Prisma.SortOrder
   headline?: Prisma.SortOrder
-  subheadline?: Prisma.SortOrder
   accentColor?: Prisma.SortOrder
   backgroundColor?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -308,7 +297,6 @@ export type SubscriptionPageScalarWhereWithAggregatesInput = {
   slug?: Prisma.StringWithAggregatesFilter<"SubscriptionPage"> | string
   businessName?: Prisma.StringWithAggregatesFilter<"SubscriptionPage"> | string
   headline?: Prisma.StringWithAggregatesFilter<"SubscriptionPage"> | string
-  subheadline?: Prisma.StringWithAggregatesFilter<"SubscriptionPage"> | string
   accentColor?: Prisma.StringWithAggregatesFilter<"SubscriptionPage"> | string
   backgroundColor?: Prisma.StringWithAggregatesFilter<"SubscriptionPage"> | string
   currency?: Prisma.StringWithAggregatesFilter<"SubscriptionPage"> | string
@@ -324,7 +312,6 @@ export type SubscriptionPageCreateInput = {
   slug: string
   businessName: string
   headline: string
-  subheadline?: string
   accentColor: string
   backgroundColor: string
   currency?: string
@@ -341,7 +328,6 @@ export type SubscriptionPageUncheckedCreateInput = {
   slug: string
   businessName: string
   headline: string
-  subheadline?: string
   accentColor: string
   backgroundColor: string
   currency?: string
@@ -358,7 +344,6 @@ export type SubscriptionPageUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   businessName?: Prisma.StringFieldUpdateOperationsInput | string
   headline?: Prisma.StringFieldUpdateOperationsInput | string
-  subheadline?: Prisma.StringFieldUpdateOperationsInput | string
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   backgroundColor?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -375,7 +360,6 @@ export type SubscriptionPageUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   businessName?: Prisma.StringFieldUpdateOperationsInput | string
   headline?: Prisma.StringFieldUpdateOperationsInput | string
-  subheadline?: Prisma.StringFieldUpdateOperationsInput | string
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   backgroundColor?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -392,7 +376,6 @@ export type SubscriptionPageCreateManyInput = {
   slug: string
   businessName: string
   headline: string
-  subheadline?: string
   accentColor: string
   backgroundColor: string
   currency?: string
@@ -408,7 +391,6 @@ export type SubscriptionPageUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   businessName?: Prisma.StringFieldUpdateOperationsInput | string
   headline?: Prisma.StringFieldUpdateOperationsInput | string
-  subheadline?: Prisma.StringFieldUpdateOperationsInput | string
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   backgroundColor?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -424,7 +406,6 @@ export type SubscriptionPageUncheckedUpdateManyInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   businessName?: Prisma.StringFieldUpdateOperationsInput | string
   headline?: Prisma.StringFieldUpdateOperationsInput | string
-  subheadline?: Prisma.StringFieldUpdateOperationsInput | string
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   backgroundColor?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -440,7 +421,6 @@ export type SubscriptionPageCountOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   businessName?: Prisma.SortOrder
   headline?: Prisma.SortOrder
-  subheadline?: Prisma.SortOrder
   accentColor?: Prisma.SortOrder
   backgroundColor?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -456,7 +436,6 @@ export type SubscriptionPageMaxOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   businessName?: Prisma.SortOrder
   headline?: Prisma.SortOrder
-  subheadline?: Prisma.SortOrder
   accentColor?: Prisma.SortOrder
   backgroundColor?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -471,7 +450,6 @@ export type SubscriptionPageMinOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   businessName?: Prisma.SortOrder
   headline?: Prisma.SortOrder
-  subheadline?: Prisma.SortOrder
   accentColor?: Prisma.SortOrder
   backgroundColor?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -517,7 +495,6 @@ export type SubscriptionPageCreateWithoutPaymentsInput = {
   slug: string
   businessName: string
   headline: string
-  subheadline?: string
   accentColor: string
   backgroundColor: string
   currency?: string
@@ -533,7 +510,6 @@ export type SubscriptionPageUncheckedCreateWithoutPaymentsInput = {
   slug: string
   businessName: string
   headline: string
-  subheadline?: string
   accentColor: string
   backgroundColor: string
   currency?: string
@@ -565,7 +541,6 @@ export type SubscriptionPageUpdateWithoutPaymentsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   businessName?: Prisma.StringFieldUpdateOperationsInput | string
   headline?: Prisma.StringFieldUpdateOperationsInput | string
-  subheadline?: Prisma.StringFieldUpdateOperationsInput | string
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   backgroundColor?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -581,7 +556,6 @@ export type SubscriptionPageUncheckedUpdateWithoutPaymentsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   businessName?: Prisma.StringFieldUpdateOperationsInput | string
   headline?: Prisma.StringFieldUpdateOperationsInput | string
-  subheadline?: Prisma.StringFieldUpdateOperationsInput | string
   accentColor?: Prisma.StringFieldUpdateOperationsInput | string
   backgroundColor?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -628,7 +602,6 @@ export type SubscriptionPageSelect<ExtArgs extends runtime.Types.Extensions.Inte
   slug?: boolean
   businessName?: boolean
   headline?: boolean
-  subheadline?: boolean
   accentColor?: boolean
   backgroundColor?: boolean
   currency?: boolean
@@ -646,7 +619,6 @@ export type SubscriptionPageSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   slug?: boolean
   businessName?: boolean
   headline?: boolean
-  subheadline?: boolean
   accentColor?: boolean
   backgroundColor?: boolean
   currency?: boolean
@@ -662,7 +634,6 @@ export type SubscriptionPageSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   slug?: boolean
   businessName?: boolean
   headline?: boolean
-  subheadline?: boolean
   accentColor?: boolean
   backgroundColor?: boolean
   currency?: boolean
@@ -678,7 +649,6 @@ export type SubscriptionPageSelectScalar = {
   slug?: boolean
   businessName?: boolean
   headline?: boolean
-  subheadline?: boolean
   accentColor?: boolean
   backgroundColor?: boolean
   currency?: boolean
@@ -690,7 +660,7 @@ export type SubscriptionPageSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SubscriptionPageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"slug" | "businessName" | "headline" | "subheadline" | "accentColor" | "backgroundColor" | "currency" | "checkoutUrl" | "walletAddress" | "imageUrl" | "tiers" | "createdAt" | "updatedAt", ExtArgs["result"]["subscriptionPage"]>
+export type SubscriptionPageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"slug" | "businessName" | "headline" | "accentColor" | "backgroundColor" | "currency" | "checkoutUrl" | "walletAddress" | "imageUrl" | "tiers" | "createdAt" | "updatedAt", ExtArgs["result"]["subscriptionPage"]>
 export type SubscriptionPageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   payments?: boolean | Prisma.SubscriptionPage$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.SubscriptionPageCountOutputTypeDefaultArgs<ExtArgs>
@@ -707,7 +677,6 @@ export type $SubscriptionPagePayload<ExtArgs extends runtime.Types.Extensions.In
     slug: string
     businessName: string
     headline: string
-    subheadline: string
     accentColor: string
     backgroundColor: string
     currency: string
@@ -1144,7 +1113,6 @@ export interface SubscriptionPageFieldRefs {
   readonly slug: Prisma.FieldRef<"SubscriptionPage", 'String'>
   readonly businessName: Prisma.FieldRef<"SubscriptionPage", 'String'>
   readonly headline: Prisma.FieldRef<"SubscriptionPage", 'String'>
-  readonly subheadline: Prisma.FieldRef<"SubscriptionPage", 'String'>
   readonly accentColor: Prisma.FieldRef<"SubscriptionPage", 'String'>
   readonly backgroundColor: Prisma.FieldRef<"SubscriptionPage", 'String'>
   readonly currency: Prisma.FieldRef<"SubscriptionPage", 'String'>

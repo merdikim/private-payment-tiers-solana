@@ -596,7 +596,6 @@ export const SubscriptionPageScalarFieldEnum = {
   slug: 'slug',
   businessName: 'businessName',
   headline: 'headline',
-  subheadline: 'subheadline',
   accentColor: 'accentColor',
   backgroundColor: 'backgroundColor',
   currency: 'currency',

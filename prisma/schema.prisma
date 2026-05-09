@@ -11,7 +11,6 @@ model SubscriptionPage {
   slug            String   @id
   businessName    String   @map("business_name")
   headline        String
-  subheadline     String   @default("")
   accentColor     String   @map("accent_color")
   backgroundColor String   @map("background_color")
   currency        String   @default("$")
