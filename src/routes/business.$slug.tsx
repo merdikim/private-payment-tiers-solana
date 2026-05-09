@@ -29,6 +29,14 @@ export const Route = createFileRoute("/business/$slug")({
 
     return page;
   },
+  head: (page) => ({
+    meta: [
+      {
+        title: `${ page.loaderData?.businessName} chekout | Delta Pay`,
+        "aria-description": page.loaderData?.headline
+      },
+    ]
+  }),
   component: PublicPricingPage,
 });
 

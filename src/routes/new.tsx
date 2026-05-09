@@ -191,22 +191,18 @@ function NewCheckoutPage() {
   };
 
   return (
-    <main className="page-wrap px-4 py-8">
-      <section className="mb-6">
+    <main className="page-wrap px-4 py-10">
+      <section className="mb-8">
         <div>
-          <h1 className="mb-3 max-w-4xl text-xxl font-bold tracking-tight text-(--sea-ink) sm:text-3xl">
-            New Checkout page for your business.
+          <h1 className="mb-4 max-w-4xl text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            Create a new checkout page
           </h1>
-          <p className="max-w-3xl text-base leading-7 text-(--sea-ink-soft)">
-            Create a pricing tier for each item, package, or service customers
-            can pay for.
-          </p>
         </div>
       </section>
 
-      <section className="grid items-start gap-5 xl:grid-cols-[410px_1fr]">
+      <section className="grid items-start gap-8 xl:grid-cols-[420px_1fr]">
         <div className="xl:sticky xl:top-24">
-          <Panel title="Business Information" icon={<LinkIcon size={17} />}>
+          <Panel title="Business Information" icon={<LinkIcon size={20} />}>
             <Field
               label="Business name"
               value={page.businessName}
@@ -233,18 +229,19 @@ function NewCheckoutPage() {
                 onFileSelected={(file) => setSelectedFile(file)}
               />
             </div>
-            <div className="border-t border-(--line) pt-3">
+            <div className="border-t border-slate-200 pt-5">
               <Button
                 type="button"
                 className="w-full"
+                size="lg"
                 disabled={savePage.isPending || !merchantWalletReady}
                 onClick={publishPage}
               >
-                <Save size={15} aria-hidden="true" />
+                <Save size={16} aria-hidden="true" />
                 {savePage.isPending
                   ? "Publishing..."
                   : merchantWalletReady
-                    ? "Publish checkout page"
+                    ? "Publish page"
                     : "Preparing wallet..."}
               </Button>
             </div>
@@ -269,15 +266,17 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className="island-shell rounded-lg p-4">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="m-0 flex items-center gap-2 text-base font-bold text-(--sea-ink)">
-          {icon}
+    <section className="island-shell rounded-2xl p-6">
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <h2 className="m-0 flex items-center gap-3 text-lg font-bold text-slate-900">
+          <span className="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-100 text-blue-600">
+            {icon}
+          </span>
           {title}
         </h2>
         {action}
       </div>
-      <div className="space-y-3">{children}</div>
+      <div className="space-y-5">{children}</div>
     </section>
   );
 }
@@ -299,12 +298,12 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="field-label">
+      <span className="text-sm font-semibold text-slate-900 mb-2 block">
         {label}
-        {required ? <span aria-hidden="true"> *</span> : null}
+        {required ? <span aria-hidden="true" className="text-red-600"> *</span> : null}
       </span>
       <input
-        className="field-input"
+        className="w-full px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
         type={type}
         value={value}
         placeholder={placeholder}
@@ -331,12 +330,12 @@ function TextArea({
 }) {
   return (
     <label className="block">
-      <span className="field-label">
+      <span className="text-sm font-semibold text-slate-900 mb-2 block">
         {label}
-        {required ? <span aria-hidden="true"> *</span> : null}
+        {required ? <span aria-hidden="true" className="text-red-600"> *</span> : null}
       </span>
       <textarea
-        className="field-input min-h-24 resize-y leading-6"
+        className="w-full px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-y leading-6 min-h-24"
         value={value}
         placeholder={placeholder}
         required={required}
@@ -384,10 +383,10 @@ function PricingPreview({
     return (
       <article
         key={tier.id}
-        className="rounded-lg border border-(--line) bg-white p-3"
+        className="rounded-xl border border-slate-200 bg-white p-5 hover:border-slate-300 transition-colors"
       >
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <p className="m-0 text-sm font-black text-(--sea-ink)">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <p className="m-0 text-base font-bold text-slate-900">
             Tier {index + 1}
           </p>
           <Button
@@ -397,19 +396,20 @@ function PricingPreview({
             title="Remove tier"
             disabled={page.tiers.length <= 1}
             onClick={() => removeTier(tier.id)}
+            className="h-8 w-8"
           >
-            <Trash2 size={15} aria-hidden="true" />
+            <Trash2 size={16} aria-hidden="true" />
             <span className="sr-only">Remove tier</span>
           </Button>
         </div>
 
-        <div className="grid gap-2 lg:grid-cols-[1fr_150px]">
+        <div className="grid gap-3 lg:grid-cols-[1fr_160px]">
           <label className="block">
-            <span className="field-label">
-              Item or service <span aria-hidden="true">*</span>
+            <span className="text-sm font-semibold text-slate-900 mb-2 block">
+              Item or service <span aria-hidden="true" className="text-red-600">*</span>
             </span>
             <input
-              className="field-input field-input-compact"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
               value={tier.name}
               placeholder={placeholders.name}
               onChange={(event) =>
@@ -419,13 +419,13 @@ function PricingPreview({
           </label>
 
           <label className="block">
-            <span className="field-label">
-              Price <span aria-hidden="true">*</span>
+            <span className="text-sm font-semibold text-slate-900 mb-2 block">
+              Price <span aria-hidden="true" className="text-red-600">*</span>
             </span>
-            <span className="flex min-h-10 items-center gap-1 rounded-md border border-black bg-white px-3">
-              <span className="font-black">{page.currency}</span>
+            <div className="flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all">
+              <span className="text-sm font-semibold text-slate-600">{page.currency}</span>
               <input
-                className="min-w-0 flex-1 border-0 bg-transparent text-base font-black outline-none"
+                className="min-w-0 flex-1 border-0 bg-transparent text-base font-semibold text-slate-900 outline-none placeholder-slate-400"
                 type="number"
                 value={tier.price > 0 ? String(tier.price) : ""}
                 placeholder={placeholders.price}
@@ -433,14 +433,14 @@ function PricingPreview({
                   updateTier(tier.id, { price: Number(event.target.value) })
                 }
               />
-            </span>
+            </div>
           </label>
         </div>
 
-        <label className="mt-2 block">
-          <span className="field-label">Description</span>
+        <label className="mt-3 block">
+          <span className="text-sm font-semibold text-slate-900 mb-2 block">Description</span>
           <input
-            className="field-input field-input-compact"
+            className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
             value={tier.description}
             placeholder={placeholders.description}
             onChange={(event) =>
@@ -453,16 +453,16 @@ function PricingPreview({
   };
 
   return (
-    <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-(--line) bg-white xl:max-h-[calc(100vh-8rem)]">
-      <div className="shrink-0 border-t-5 border-black bg-white p-5">
+    <section className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white xl:max-h-[calc(100vh-8rem)] shadow-sm">
+      <div className="shrink-0 border-b border-slate-200 bg-white p-6">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
           <div>
-            <p className="m-0 text-2xl font-bold text-black">
+            <p className="m-0 text-2xl font-bold text-slate-900">
               {page.businessName || pagePlaceholders.businessName}
             </p>
-            <h2 className="mb-2 mt-2 max-w-3xl text-sm font-bold text-slate-950">
+            <p className="mb-0 mt-3 max-w-3xl text-base leading-7 text-slate-600">
               {page.headline || pagePlaceholders.headline}
-            </h2>
+            </p>
           </div>
 
           <Button type="button" variant="outline" onClick={addTier}>
@@ -472,7 +472,7 @@ function PricingPreview({
         </div>
       </div>
 
-      <div className="grid gap-3 overflow-y-auto border-t border-(--line) p-4">
+      <div className="grid gap-3 overflow-y-auto p-6">
         {page.tiers.map(renderTierEditor)}
       </div>
     </section>

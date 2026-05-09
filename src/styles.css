@@ -2,26 +2,51 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
-  --sea-ink: #000000;
-  --sea-ink-soft: #525252;
-  --accent: #000000;
-  --accent-strong: #171717;
-  --danger: #000000;
-  --bg-base: #ffffff;
+  /* Primary colors - Modern fintech slate/navy palette */
+  --sea-ink: #0f172a;
+  --sea-ink-soft: #64748b;
+  --sea-ink-lighter: #cbd5e1;
+  
+  /* Accent colors */
+  --accent: #3b82f6;
+  --accent-strong: #1e40af;
+  --accent-light: #dbeafe;
+  
+  /* Secondary accent - Success/positive */
+  --accent-success: #10b981;
+  --accent-success-light: #d1fae5;
+  
+  /* Danger/attention */
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  
+  /* Backgrounds and surfaces */
+  --bg-base: #f8fafc;
   --surface: #ffffff;
   --surface-strong: #ffffff;
-  --surface-muted: #f5f5f5;
-  --line: #000000;
+  --surface-muted: #f1f5f9;
+  --surface-hover: #f0f4f8;
+  
+  /* Borders and dividers */
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
   --inset-glint: #ffffff;
+  
+  /* UI regions */
   --header-bg: #ffffff;
-  --chip-bg: #ffffff;
-  --chip-line: #000000;
-  --link-bg-hover: #f5f5f5;
-  --kicker: #000000;
+  --chip-bg: #f1f5f9;
+  --chip-line: #cbd5e1;
+  --link-bg-hover: #f0f4f8;
+  
+  /* Text hierarchy */
+  --kicker: #64748b;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
 }
 
 * {
@@ -44,15 +69,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Enhanced links with modern styling */
 a:not([data-slot="button"]) {
-  color: #000000;
-  text-decoration-color: #000000;
+  color: var(--accent);
+  text-decoration-color: var(--accent);
   text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
+  font-weight: 500;
+  transition: color 160ms ease;
 }
 
 a:not([data-slot="button"]):hover {
-  color: #171717;
+  color: var(--accent-strong);
 }
 
 button,
@@ -68,24 +96,33 @@ button {
 
 button:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 ul {
   list-style: none;
 }
 
+/* Improved page wrapper */
 .page-wrap {
   width: min(1520px, calc(100% - 2rem));
   margin-inline: auto;
 }
 
+/* Modern card styling without harsh borders */
 .island-shell {
-  border: 1px solid #000000;
-  background: #ffffff;
-  box-shadow: 6px 6px 0 #000000;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.06);
+  transition: box-shadow 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
+.island-shell:hover {
+  box-shadow: 0 4px 6px rgba(15, 23, 42, 0.1), 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* Smooth transitions */
 button,
 .island-shell,
 a,

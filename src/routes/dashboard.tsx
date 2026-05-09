@@ -146,16 +146,16 @@ function Dashboard() {
   }, [activePages, selectedSlug]);
 
   return (
-    <main className="page-wrap min-h-[calc(100vh-230px)] px-4 py-8">
-      <section className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+    <main className="page-wrap min-h-[calc(100vh-230px)] px-4 py-10">
+      <section className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
-          <p className="island-kicker mb-2">Dashboard</p>
+          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">Dashboard</p>
         </div>
 
         <Button asChild>
           <Link to="/new" className="no-underline">
             <Plus size={16} aria-hidden="true" />
-            Create New Checkout Page
+            New checkout page
           </Link>
         </Button>
       </section>
@@ -163,30 +163,31 @@ function Dashboard() {
       {isPending || paymentsPending ? (
         <DashboardLoading />
       ) : activePages.length === 0 ? (
-        <section className="island-shell grid min-h-90 place-items-center rounded-lg p-6 text-center">
+        <section className="island-shell grid min-h-80 place-items-center rounded-2xl p-8 text-center">
           <div className="mx-auto max-w-md">
-            <FilePlus2
-              size={34}
-              aria-hidden="true"
-              className="mx-auto mb-5 text-(--accent)"
-            />
-            <h1 className="m-0 text-2xl font-black text-(--sea-ink)">
-              No businesses found
+            <div className="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-6">
+              <FilePlus2
+                size={32}
+                aria-hidden="true"
+                className="text-blue-600"
+              />
+            </div>
+            <h1 className="m-0 text-2xl font-bold text-slate-900 mb-2">
+              No checkout pages yet
             </h1>
-            <p className="mx-auto mb-6 mt-3 max-w-sm text-sm leading-6 text-(--sea-ink-soft)">
-              Create your first business pricing menu, add item tiers, and
-              accept Solana wallet payments.
+            <p className="mx-auto mb-8 text-slate-600 leading-6">
+              Create your first checkout page to start accepting Solana USDC payments. Add one or multiple pricing tiers and customize the branding.
             </p>
             <Button asChild>
               <Link to="/new" className="no-underline">
                 <Plus size={16} aria-hidden="true" />
-                Create New Checkout Page
+                Create your first checkout page
               </Link>
             </Button>
           </div>
         </section>
       ) : (
-        <div className="grid gap-5 xl:grid-cols-[290px_1fr_360px]">
+        <div className="grid gap-6 xl:grid-cols-[300px_1fr_380px]">
           <ProjectSidebar
             pages={activePages}
             payments={payments}
@@ -202,18 +203,18 @@ function Dashboard() {
             origin={origin}
           />
 
-          <aside className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+          <aside className="space-y-5">
+            <div className="grid grid-cols-2 gap-4">
               <MetricCard
-                icon={<BadgeDollarSign size={18} aria-hidden="true" />}
-                label="USDC volume"
+                icon={<BadgeDollarSign size={20} aria-hidden="true" />}
+                label="Volume"
                 value={`$${totalRevenue.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}`}
               />
               <MetricCard
-                icon={<ReceiptText size={18} aria-hidden="true" />}
+                icon={<ReceiptText size={20} aria-hidden="true" />}
                 label="Payments"
                 value={String(successfulPayments)}
               />
@@ -225,44 +226,43 @@ function Dashboard() {
               onSave={(nextPage) => savePage.mutate(nextPage)}
             />
 
-            <section className="island-shell rounded-lg p-4">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className="m-0 text-base font-black text-(--sea-ink)">
+            <section className="island-shell rounded-2xl p-6">
+              <div className="mb-5 flex items-center justify-between gap-3">
+                <h2 className="m-0 text-lg font-bold text-slate-900">
                   Recent payments
                 </h2>
-                <span className="rounded-md border border-black px-2 py-1 text-[11px] font-black">
+                <span className="rounded-lg bg-blue-100 text-blue-700 px-2.5 py-1 text-xs font-semibold">
                   USDC
                 </span>
               </div>
 
               {payments.length === 0 ? (
-                <p className="m-0 text-sm leading-6 text-(--sea-ink-soft)">
-                  Completed wallet payments will appear here with the payer,
-                  tier, amount, and transaction signature.
+                <p className="m-0 text-sm leading-6 text-slate-600">
+                  Payments will appear here with the tier, amount, wallet address, and transaction confirmation.
                 </p>
               ) : (
-                <div className="divide-y divide-(--line)">
+                <div className="space-y-3">
                   {payments.slice(0, 8).map((payment) => (
                     <article
                       key={payment.id}
-                      className="py-3 first:pt-0 last:pb-0"
+                      className="py-3 px-3 rounded-lg bg-slate-50 border border-slate-200 first:pt-0 last:pb-0"
                     >
-                      <div className="mb-1 flex items-start justify-between gap-3">
+                      <div className="mb-2 flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="m-0 truncate text-sm font-black text-(--sea-ink)">
+                          <p className="m-0 truncate text-sm font-semibold text-slate-900">
                             {payment.tierName}
                           </p>
-                          <p className="m-0 mt-0.5 truncate text-xs text-(--sea-ink-soft)">
+                          <p className="m-0 mt-0.5 truncate text-xs text-slate-600">
                             {payment.payerWallet}
                           </p>
                         </div>
-                        <p className="m-0 shrink-0 text-sm font-black text-(--sea-ink)">
+                        <p className="m-0 shrink-0 text-sm font-bold text-slate-900">
                           ${payment.amountUsd.toFixed(2)}
                         </p>
                       </div>
-                      <div className="flex items-center justify-between gap-2 text-[11px] font-bold uppercase text-(--sea-ink-soft)">
-                        <span>{payment.status}</span>
-                        <span>
+                      <div className="flex items-center justify-between gap-2 text-xs font-semibold text-slate-600">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 text-green-700 px-2 py-1">✓ {payment.status}</span>
+                        <span className="font-mono text-slate-500">
                           {payment.signature.slice(0, 6)}...
                           {payment.signature.slice(-6)}
                         </span>
@@ -291,15 +291,15 @@ function ProjectSidebar({
   onSelect: (slug: string) => void;
 }) {
   return (
-    <aside className="island-shell h-fit rounded-lg p-3 xl:sticky xl:top-24">
-      <div className="mb-3 flex items-center justify-between gap-3 px-1">
-        <h2 className="m-0 text-base font-black text-(--sea-ink)">Projects</h2>
-        <span className="rounded-md border border-black px-2 py-1 text-[11px] font-black">
+    <aside className="island-shell h-fit rounded-2xl p-4 xl:sticky xl:top-24">
+      <div className="mb-4 flex items-center justify-between gap-3 px-2">
+        <h2 className="m-0 text-sm font-bold text-slate-900">Checkout pages</h2>
+        <span className="rounded-lg bg-blue-100 text-blue-700 px-2.5 py-1 text-xs font-semibold">
           {pages.length}
         </span>
       </div>
 
-      <div className="grid gap-2">
+      <div className="space-y-2">
         {pages.map((page) => {
           const isSelected = page.slug === selectedSlug;
           const pagePayments = payments.filter(
@@ -310,30 +310,30 @@ function ProjectSidebar({
             <button
               key={page.slug}
               type="button"
-              className={`min-h-20 rounded-md border border-black p-3 text-left ${
+              className={`min-h-20 rounded-lg border p-3 text-left transition-all w-full ${
                 isSelected
-                  ? "bg-black text-white shadow-[4px_4px_0_#a3a3a3]"
-                  : "bg-white text-black hover:bg-(--surface-muted)"
+                  ? "border-blue-600 bg-blue-50 shadow-sm"
+                  : "border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300"
               }`}
               onClick={() => onSelect(page.slug)}
             >
-              <div className="mb-2 flex items-start justify-between gap-3">
-                <span className="min-w-0 truncate text-sm font-black">
+              <div className="mb-2 flex items-start justify-between gap-2">
+                <span className={`min-w-0 truncate text-sm font-bold ${isSelected ? "text-slate-900" : "text-slate-900"}`}>
                   {page.businessName}
                 </span>
                 <span
-                  className={`h-3 w-3 shrink-0 rounded-full border ${
-                    isSelected ? "border-white" : "border-black"
+                  className={`h-3 w-3 shrink-0 rounded-full border-2 ${
+                    isSelected ? "border-blue-600" : "border-slate-300"
                   }`}
                   style={{ backgroundColor: page.accentColor }}
                 />
               </div>
               <span
-                className={`block text-[11px] font-bold uppercase ${
-                  isSelected ? "text-neutral-300" : "text-(--sea-ink-soft)"
+                className={`block text-xs font-semibold ${
+                  isSelected ? "text-blue-700" : "text-slate-600"
                 }`}
               >
-                {page.tiers.length} tiers · {pagePayments.length} payments
+                {page.tiers.length} tiers • {pagePayments.length} payment{pagePayments.length !== 1 ? 's' : ''}
               </span>
             </button>
           );
@@ -396,37 +396,37 @@ function ProjectEditor({
     <>
       <button
         type="button"
-        className="island-shell flex w-full items-center justify-between gap-4 rounded-lg p-4 text-left hover:bg-(--surface-muted)"
+        className="island-shell flex w-full items-center justify-between gap-4 rounded-2xl p-5 text-left hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition-all"
         onClick={() => setIsOpen(true)}
       >
         <span className="min-w-0">
-          <span className="mb-1 flex items-center gap-2 text-base font-black text-(--sea-ink)">
-            <Pencil size={17} aria-hidden="true" />
+          <span className="mb-1 flex items-center gap-2 text-base font-bold text-slate-900">
+            <Pencil size={18} aria-hidden="true" />
             Edit checkout page
           </span>
-          <span className="block text-sm leading-6 text-(--sea-ink-soft)">
+          <span className="block text-sm leading-6 text-slate-600">
             Update business details and pricing tiers.
           </span>
         </span>
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-black bg-white">
-          <Pencil size={16} aria-hidden="true" />
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+          <Pencil size={18} aria-hidden="true" />
         </span>
       </button>
 
       {isOpen ? (
         <div
-          className="fixed inset-0 z-100 grid place-items-center overflow-y-auto bg-black/35 p-4"
+          className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-labelledby="project-editor-title"
         >
-          <section className="island-shell my-6 max-h-[calc(100vh-3rem)] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-4 sm:p-5">
-            <div className="mb-4 flex items-start justify-between gap-3">
+          <section className="island-shell my-6 max-h-[calc(100vh-3rem)] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 sm:p-8">
+            <div className="mb-6 flex items-start justify-between gap-3">
               <div>
-                <p className="island-kicker mb-2">Edit checkout</p>
+                <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">Edit checkout</p>
                 <h2
                   id="project-editor-title"
-                  className="m-0 text-2xl font-black text-(--sea-ink)"
+                  className="m-0 text-3xl font-bold text-slate-900"
                 >
                   {page.businessName}
                 </h2>
@@ -598,7 +598,6 @@ function ProjectDetails({
       <article className="island-shell rounded-lg p-5">
         <div className="mb-5 flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
           <div className="min-w-0">
-            <p className="island-kicker mb-2">Selected project</p>
             <div className="flex items-center gap-3">
               <span
                 className="h-4 w-4 shrink-0 rounded-full border border-black"
@@ -653,7 +652,7 @@ function ProjectDetails({
           />
         </div>
 
-        <div className="mt-5 grid gap-3">
+        <div className="hidden mt-5 sm:grid gap-3">
           <CopyRow
             className="bg-white"
             icon={<LinkIcon size={16} aria-hidden="true" />}
@@ -740,14 +739,14 @@ function MetricCard({
   value: string;
 }) {
   return (
-    <section className="island-shell rounded-lg p-4">
-      <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-md border border-black">
+    <section className="island-shell rounded-2xl p-5 border border-slate-200">
+      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
         {icon}
       </div>
-      <p className="m-0 text-[11px] font-black uppercase text-(--sea-ink-soft)">
+      <p className="m-0 text-xs font-semibold uppercase text-slate-600 tracking-wide">
         {label}
       </p>
-      <p className="m-0 mt-1 text-2xl font-black text-(--sea-ink)">{value}</p>
+      <p className="m-0 mt-2 text-3xl font-bold text-slate-900">{value}</p>
     </section>
   );
 }
@@ -791,71 +790,71 @@ function CopyRow({
 
 function DashboardLoading() {
   return (
-    <div className="grid gap-5 xl:grid-cols-[290px_1fr_360px]">
-      <aside className="island-shell h-fit rounded-lg p-3 xl:sticky xl:top-24">
-        <div className="mb-3 flex items-center justify-between gap-3 px-1">
-          <div className="h-5 w-20 rounded-md bg-(--surface-muted)" />
-          <div className="h-7 w-9 rounded-md border border-black bg-white" />
+    <div className="grid gap-6 xl:grid-cols-[300px_1fr_380px]">
+      <aside className="island-shell h-fit rounded-2xl p-4 xl:sticky xl:top-24">
+        <div className="mb-4 flex items-center justify-between gap-3 px-2">
+          <div className="h-5 w-20 rounded-lg bg-slate-200 animate-pulse" />
+          <div className="h-7 w-9 rounded-lg bg-slate-200 animate-pulse" />
         </div>
 
-        <div className="grid gap-2">
+        <div className="space-y-2">
           {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className="min-h-20 rounded-md border border-black bg-white p-3"
+              className="min-h-20 rounded-lg border border-slate-200 bg-white p-3 animate-pulse"
             >
               <div className="mb-3 flex items-start justify-between gap-3">
-                <div className="h-4 w-36 rounded-md bg-(--surface-muted)" />
-                <div className="h-3 w-3 shrink-0 rounded-full border border-black bg-(--surface-muted)" />
+                <div className="h-4 w-36 rounded-lg bg-slate-100" />
+                <div className="h-3 w-3 shrink-0 rounded-full bg-slate-100" />
               </div>
-              <div className="h-3 w-28 rounded-md bg-(--surface-muted)" />
+              <div className="h-3 w-28 rounded-lg bg-slate-100" />
             </div>
           ))}
         </div>
       </aside>
 
-      <section className="min-w-0 space-y-5">
-        <article className="island-shell rounded-lg p-5">
-          <div className="mb-5 flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+      <section className="min-w-0 space-y-6">
+        <article className="island-shell rounded-2xl p-6">
+          <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
             <div className="min-w-0 flex-1">
-              <div className="mb-3 h-3 w-28 rounded-full bg-(--surface-muted)" />
-              <h1 className="m-0 flex items-center gap-3 text-2xl font-black text-(--sea-ink)">
+              <div className="mb-3 h-3 w-28 rounded-full bg-slate-200 animate-pulse" />
+              <h1 className="m-0 flex items-center gap-3 text-2xl font-bold text-slate-900">
                 <LoaderCircle
-                  size={22}
+                  size={24}
                   aria-hidden="true"
-                  className="animate-spin"
+                  className="animate-spin text-blue-600"
                 />
                 Loading dashboard
               </h1>
-              <div className="mt-4 h-4 w-full max-w-xl rounded-md bg-(--surface-muted)" />
-              <div className="mt-3 h-3 w-full max-w-lg rounded-md bg-(--surface-muted)" />
+              <div className="mt-4 h-4 w-full max-w-xl rounded-lg bg-slate-100 animate-pulse" />
+              <div className="mt-3 h-3 w-full max-w-lg rounded-lg bg-slate-100 animate-pulse" />
             </div>
 
-            <div className="h-10 w-full rounded-md border border-black bg-white sm:w-28" />
+            <div className="h-10 w-full rounded-lg bg-slate-100 sm:w-28 animate-pulse" />
           </div>
 
-          <div className="grid border-y border-black md:grid-cols-3">
+          <div className="grid border-y border-slate-200 md:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
               <div
                 key={index}
-                className="flex min-h-24 items-center gap-3 border-b border-black py-4 last:border-b-0 md:border-b-0 md:border-r md:px-4 md:first:pl-0 md:last:border-r-0 md:last:pr-0"
+                className="flex min-h-24 items-center gap-3 border-b border-slate-200 py-4 last:border-b-0 md:border-b-0 md:border-r md:px-4 md:first:pl-0 md:last:border-r-0 md:last:pr-0 animate-pulse"
               >
-                <div className="h-8 w-8 shrink-0 rounded-md border border-black bg-white" />
+                <div className="h-10 w-10 shrink-0 rounded-lg bg-blue-100" />
                 <div className="min-w-0 flex-1">
-                  <div className="h-3 w-24 rounded-md bg-(--surface-muted)" />
-                  <div className="mt-2 h-6 w-16 rounded-md bg-(--surface-muted)" />
+                  <div className="h-3 w-24 rounded-lg bg-slate-100" />
+                  <div className="mt-2 h-6 w-16 rounded-lg bg-slate-100" />
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-5 grid gap-3">
-            <div className="h-8 rounded-md border border-(--line) bg-(--surface-muted)" />
-            <div className="h-8 rounded-md border border-(--line) bg-(--surface-muted)" />
+          <div className="mt-6 space-y-3">
+            <div className="h-10 rounded-lg border border-slate-200 bg-slate-50" />
+            <div className="h-10 rounded-lg border border-slate-200 bg-slate-50" />
           </div>
         </article>
 
-        <section className="overflow-hidden rounded-lg border border-black bg-white">
+        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
           {Array.from({ length: 3 }).map((_, index) => (
             <article
               key={index}

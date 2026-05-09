@@ -35,7 +35,6 @@ export default function PrivyClientProvider({
           theme: "light",
           accentColor: "#000000",
           logo: undefined,
-          showWalletLoginFirst: false,
           walletChainType: "solana-only",
           walletList: ["phantom", "metamask", "backpack", "detected_solana_wallets", "wallet_connect_qr_solana"],
         },
