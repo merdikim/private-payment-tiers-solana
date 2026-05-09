@@ -25,7 +25,7 @@ export default function CheckoutNavbar({ page }: { page: SubscriptionPage }) {
             to='/'
             className="text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
           >
-            <span className="hidden sm:inline">Delta Pay</span>
+            <span>Delta Pay</span>
           </Link>
           </div>
       </nav>

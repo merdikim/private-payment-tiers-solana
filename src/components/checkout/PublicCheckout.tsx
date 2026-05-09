@@ -8,6 +8,7 @@ import type {
 } from "@/hooks/useCheckoutPayment";
 import type { SubscriptionPage, Tier } from "@/lib/subscriptionPage";
 import CheckoutNavbar from "./CheckoutNavbar";
+import delta_pay_logo from "@/assets/deltapay.png";
 
 type PublicCheckoutProps = {
   customerWalletAddress?: string;
@@ -103,15 +104,15 @@ function CheckoutHeader({ page }: { page: SubscriptionPage }) {
         </p>
       ) : null}
         </div>
-        {page.imageUrl && (
+        
           <div className="mt-6 flex items-center">
             <img
-              src={page.imageUrl}
+              src={page.imageUrl || delta_pay_logo}
               alt={page.businessName}
               className="h-24 w-24 object-cover rounded-lg shadow-sm border border-slate-200 sm:h-32 sm:w-32"
             />
           </div>
-        )}
+        
       </div>
     </div>
   );
