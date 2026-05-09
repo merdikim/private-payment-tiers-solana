@@ -14,7 +14,6 @@ export type SubscriptionPage = {
   slug: string;
   businessName: string;
   headline: string;
-  subheadline: string;
   accentColor: string;
   backgroundColor: string;
   currency: string;
@@ -55,7 +54,6 @@ export const draftSubscriptionPage: SubscriptionPage = {
   slug: "",
   businessName: "",
   headline: "",
-  subheadline: "",
   accentColor: "#000000",
   backgroundColor: "#ffffff",
   currency: "$",

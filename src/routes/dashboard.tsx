@@ -612,11 +612,6 @@ function ProjectDetails({
                 {page.headline}
               </p>
             ) : null}
-            {page.subheadline ? (
-              <p className="m-0 mt-2 max-w-2xl text-sm leading-6 text-(--sea-ink-soft)">
-                {page.subheadline}
-              </p>
-            ) : null}
           </div>
 
           <Button asChild variant="outline">
