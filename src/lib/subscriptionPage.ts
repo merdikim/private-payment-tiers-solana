@@ -1,27 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-
-export type Tier = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  cta: string;
-  featured: boolean;
-  features: string[];
-};
-
-export type SubscriptionPage = {
-  slug: string;
-  businessName: string;
-  headline: string;
-  accentColor: string;
-  backgroundColor: string;
-  currency: string;
-  checkoutUrl: string;
-  walletAddress: string;
-  imageUrl?: string;
-  tiers: Tier[];
-};
+import type { Tier, SubscriptionPage } from "@/types";
 
 export const PAGE_QUERY_KEY = ["subscription-page", "active"];
 export const PAGES_QUERY_KEY = ["subscription-pages"];
@@ -216,3 +194,6 @@ export const uploadImage = createServerFn({ method: "POST" })
 
     return uploaded.url;
   });
+
+// Re-export types for backward compatibility
+export type { Tier, SubscriptionPage };

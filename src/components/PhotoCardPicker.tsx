@@ -2,10 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
-interface PhotoPickerProps {
-  onFileSelected?: (file: File | null) => void;
-}
+import type { PhotoPickerProps } from "@/types";
 
 export default function PhotoPicker({ onFileSelected }: PhotoPickerProps) {
   const [file, setFile] = useState<File | null>(null);

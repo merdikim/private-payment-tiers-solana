@@ -1,17 +1,13 @@
 import "@tanstack/react-start/client-only";
 import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
 import type { ReactNode } from "react";
+import type { PrivyClientProviderProps } from "@/types";
 import { MerchantAuthContext } from "./merchantAuth";
 import {
   toSolanaWalletConnectors,
   useWallets,
 } from "@privy-io/react-auth/solana";
 import { createSolanaRpc, createSolanaRpcSubscriptions } from "@solana/kit";
-
-type PrivyClientProviderProps = {
-  appId: string;
-  children: ReactNode;
-};
 
 const solanaRpcUrl =
   String(import.meta.env.VITE_SOLANA_RPC_URL ?? "")

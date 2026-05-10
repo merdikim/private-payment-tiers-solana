@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-
-type ThemeMode = "light" | "dark" | "auto";
+import type { ThemeMode } from "@/types";
 
 function getInitialMode(): ThemeMode {
   if (typeof window === "undefined") {

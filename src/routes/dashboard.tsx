@@ -21,14 +21,12 @@ import { Button } from "@/components/ui/button";
 import { MerchantAuthGuard } from "@/components/MerchantAuthGuard";
 import { useMerchantAuth } from "@/components/merchantAuth";
 import { useToast } from "@/hooks/use-toast";
+import type { SubscriptionPage, Tier, CheckoutPayment } from "@/types";
 import {
   checkoutPaymentsQueryKey,
-  type CheckoutPayment,
   listCheckoutPayments,
 } from "../lib/payments";
 import {
-  type SubscriptionPage,
-  type Tier,
   createEmptyTier,
   getPublicPagePath,
   listSubscriptionPages,

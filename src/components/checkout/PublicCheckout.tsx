@@ -3,24 +3,14 @@ import { useState, type ReactNode } from "react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { Button } from "@/components/ui/button";
 import type {
+  PublicCheckoutProps,
   PaymentState,
   UsdcBalanceState,
-} from "@/hooks/useCheckoutPayment";
-import type { SubscriptionPage, Tier } from "@/lib/subscriptionPage";
+  SubscriptionPage,
+  Tier,
+} from "@/types";
 import CheckoutNavbar from "./CheckoutNavbar";
 import delta_pay_logo from "@/assets/deltapay.png";
-
-type PublicCheckoutProps = {
-  customerWalletAddress?: string;
-  disconnectWallet: () => Promise<void>;
-  isCustomerWalletReady: boolean;
-  isWalletConnecting: boolean;
-  merchantWalletAddress: string;
-  page: SubscriptionPage;
-  payment: PaymentState;
-  payWithUsdc: (tier: Tier) => Promise<void>;
-  usdcBalance: UsdcBalanceState;
-};
 
 export function PublicCheckout({
   customerWalletAddress,

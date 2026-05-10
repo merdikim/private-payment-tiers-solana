@@ -1,30 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-
-export type CheckoutPaymentInput = {
-  pageSlug: string;
-  tierId: string;
-  tierName: string;
-  payerWallet: string;
-  merchantWallet: string;
-  amountUsd: number;
-  signature: string;
-};
-
-export type CheckoutPayment = {
-  id: string;
-  pageSlug: string;
-  tierId: string;
-  tierName: string;
-  payerWallet: string;
-  merchantWallet: string;
-  amountUsd: number;
-  amountUsdcBaseUnits: string;
-  token: string;
-  network: string;
-  signature: string;
-  status: string;
-  createdAt: string;
-};
+import type { CheckoutPaymentInput, CheckoutPayment } from "@/types";
 
 export const PAYMENTS_QUERY_KEY = ["checkout-payments"];
 export function checkoutPaymentsQueryKey(merchantWallet?: string) {
@@ -82,3 +57,6 @@ export const listCheckoutPayments = createServerFn({ method: "GET" })
 
     return listCheckoutPaymentsFromDatabase(data.merchantWallet);
   });
+
+// Re-export types for backward compatibility
+export type { CheckoutPaymentInput, CheckoutPayment };

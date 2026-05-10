@@ -6,44 +6,19 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import { PAYMENTS_QUERY_KEY, recordCheckoutPayment } from "@/lib/payments";
-import type { SubscriptionPage, Tier } from "@/lib/subscriptionPage";
+import type {
+  PaymentStatus,
+  PaymentState,
+  UsdcBalanceState,
+  SubscriptionPage,
+  Tier,
+} from "@/types";
 import {
   SOLANA_RPC_URLS,
   USDC_MINT_ADDRESS,
-  getPaymentErrorDetails,
   sendPrivateUsdcPayment,
 } from "@/lib/solanaCheckout";
-
-export type PaymentStatus =
-  | "idle"
-  | "connecting"
-  | "confirming"
-  | "success"
-  | "error";
-
-export type PaymentState = {
-  errorCategory?:
-    | "wallet"
-    | "network"
-    | "validation"
-    | "service"
-    | "transaction"
-    | "unknown";
-  errorTitle?: string;
-  tierId?: string;
-  status: PaymentStatus;
-  message?: string;
-  signature?: string;
-  error?: string;
-  errorRecoverable?: boolean;
-  errorSuggestion?: string;
-};
-
-export type UsdcBalanceState = {
-  amount?: string;
-  error?: string;
-  status: "idle" | "loading" | "success" | "error";
-};
+import { getPaymentErrorDetails } from "#/lib/utils";
 
 export function useCheckoutPayment(page: SubscriptionPage) {
   const { connection } = useConnection();
@@ -90,7 +65,7 @@ export function useCheckoutPayment(page: SubscriptionPage) {
         const mint = new PublicKey(USDC_MINT_ADDRESS);
         const tokenAccountAddress = getAssociatedTokenAddressSync(
           mint,
-          publicKey,
+          publicKey!,
         );
         const tokenAccount =
           await connection.getAccountInfo(tokenAccountAddress);
@@ -165,7 +140,7 @@ export function useCheckoutPayment(page: SubscriptionPage) {
       });
 
       const { signature } = await sendPrivateUsdcPayment({
-        amountUsd: 0.02, //tier.price,
+        amountUsd: tier.price,
         merchantWalletAddress,
         onProgress: (message) =>
           setPayment({ tierId: tier.id, status: "confirming", message }),
@@ -199,6 +174,7 @@ export function useCheckoutPayment(page: SubscriptionPage) {
         signature,
       });
     } catch (error) {
+      console.log(error)
       const paymentError = getPaymentErrorDetails(error);
 
       setPayment({
@@ -224,3 +200,7 @@ export function useCheckoutPayment(page: SubscriptionPage) {
     usdcBalance,
   };
 }
+
+// Re-export types for backward compatibility
+export type { PaymentStatus, PaymentState, UsdcBalanceState };
+

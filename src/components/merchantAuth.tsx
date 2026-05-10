@@ -1,13 +1,5 @@
 import { createContext, useContext, type ReactNode } from "react";
-
-export type MerchantAuthState = {
-  authenticated: boolean;
-  login: () => Promise<void>;
-  logout: () => Promise<void>;
-  ready: boolean;
-  walletAddress: string;
-  walletReady: boolean;
-};
+import type { MerchantAuthState } from "@/types";
 
 export const defaultMerchantAuthState: MerchantAuthState = {
   authenticated: false,

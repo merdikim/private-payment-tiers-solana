@@ -7,10 +7,9 @@ import { Button } from "@/components/ui/button";
 import { MerchantAuthGuard } from "@/components/MerchantAuthGuard";
 import { useMerchantAuth } from "@/components/merchantAuth";
 import { useToast } from "@/hooks/use-toast";
+import type { SubscriptionPage, Tier } from "@/types";
 import {
   PAGE_QUERY_KEY,
-  type SubscriptionPage,
-  type Tier,
   createEmptyTier,
   createSlugFromBusinessName,
   draftSubscriptionPage,
