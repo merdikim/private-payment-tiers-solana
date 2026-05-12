@@ -43,6 +43,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { QRCodeGenerator } from "@/components/QRCodeGenerator";
+import { Banner } from "@/components/ui/banner";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardRoute,
@@ -155,6 +156,7 @@ function Dashboard() {
 
   return (
     <main className="page-wrap min-h-[calc(100vh-230px)] px-4 py-10">
+      <Banner />
       <section className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">Dashboard</p>

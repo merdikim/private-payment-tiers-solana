@@ -11,6 +11,7 @@ import type {
 } from "@/types";
 import CheckoutNavbar from "./CheckoutNavbar";
 import delta_pay_logo from "@/assets/deltapay.png";
+import { Banner } from "@/components/ui/banner";
 
 export function PublicCheckout({
   customerWalletAddress,
@@ -30,6 +31,7 @@ export function PublicCheckout({
   return (
     <>
       <CheckoutNavbar page={page} />
+      <Banner />
       <main
         className="min-h-[calc(100vh-150px)] px-4 py-10 sm:py-12"
         style={{ backgroundColor: page.backgroundColor }}

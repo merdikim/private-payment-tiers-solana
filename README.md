@@ -67,7 +67,7 @@ Without Cloak, all USDC transfers would be visible on-chain. With Cloak:
 ✅ **No KYC** - Global access; no identity verification required  
  
 ### Technical details
-✅ **Solana Blockchain** - Lightning-fast, low-cost transactions on Solana Mainnet  
+✅ **Solana Blockchain** - Lightning-fast, low-cost transactions on Solana Devnet  
 ✅ **Privacy by Default** - Cloak Protocol ensures zero on-chain visibility of transaction details  
 ✅ **Real-time Updates** - Multi-step payment confirmation flow with live status  
 
@@ -79,13 +79,16 @@ Without Cloak, all USDC transfers would be visible on-chain. With Cloak:
 - **Node.js 18+** and **pnpm** (or npm)
 - **PostgreSQL** database
 
+### Note for Testing
+This application is currently configured for **Solana Devnet** for testing purposes. Users will see a banner prompting them to switch to Devnet when accessing the dashboard or payment pages. For production use, update the RPC URL and Cloak SDK imports accordingly.
+
 ### Environment Variables
 
 Create a `.env.local` file in the project root:
 
 ```env
 # Solana RPC Configuration
-VITE_SOLANA_RPC_URL=https://api.mainnet.solana.com
+VITE_SOLANA_RPC_URL=https://api.devnet.solana.com
 
 # Database
 DATABASE_URL=postgresql://user:password@localhost:5432/delta_pay
