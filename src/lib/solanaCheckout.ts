@@ -2,10 +2,11 @@ import {
   CLOAK_PROGRAM_ID,
   createUtxo,
   createZeroUtxo,
+  DEVNET_MOCK_USDC_MINT,
   fullWithdraw,
   generateUtxoKeypair,
   transact,
-} from "@cloak.dev/sdk";
+} from "@cloak.dev/sdk-devnet";
 import {
   Connection,
   PublicKey,
@@ -26,18 +27,14 @@ const CONFIGURED_SOLANA_RPC_URL = String(
 )
   .trim()
   .replace(/^['"]|['"]$/g, "");
-export const USDC_MINT_ADDRESS =
-  String(import.meta.env.VITE_SOLANA_USDC_MINT ?? "")
-    .trim()
-    .replace(/^['"]|['"]$/g, "") ||
-  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+
+export const USDC_MINT_ADDRESS = DEVNET_MOCK_USDC_MINT
 
 export const SOLANA_RPC_URLS = Array.from(
   new Set(
     [
       CONFIGURED_SOLANA_RPC_URL,
-      "https://api.mainnet.solana.com",
-      "https://api.mainnet-beta.solana.com",
+      "https://api.mainnet.solana.com"
     ].filter((url): url is string => Boolean(url)),
   ),
 );
@@ -65,9 +62,6 @@ export async function sendPrivateUsdcPayment({
   signTransaction: CloakSignTransaction;
   rpcUrls: string[];
 }) {
-  if (!USDC_MINT_ADDRESS) {
-    throw new Error("Missing VITE_SOLANA_USDC_MINT.");
-  }
 
   if (!payerWalletAddress) {
     throw new Error("Missing payer Solana wallet address.");
@@ -84,8 +78,8 @@ export async function sendPrivateUsdcPayment({
   const connection = await getAvailableSolanaConnection(rpcUrls);
   const payer = new PublicKey(payerWalletAddress);
   const merchant = new PublicKey(merchantWalletAddress);
-  const mint = new PublicKey(USDC_MINT_ADDRESS);
-  const amount = dollarsToUsdcBaseUnits(0.01) //dollarsToUsdcBaseUnits(amountUsd);
+  const mint = USDC_MINT_ADDRESS
+  const amount = dollarsToUsdcBaseUnits(amountUsd);
   const owner = await generateUtxoKeypair();
   const output = await createUtxo(amount, owner, mint);
   const cloakOptions = {
@@ -95,13 +89,10 @@ export async function sendPrivateUsdcPayment({
     walletPublicKey: payer,
     signMessage,
     signTransaction,
-    //enforceViewingKeyRegistration: false,
-    // maxRootRetries: 5,
-    // retryDelayMs: 1_500,
     onProgress,
   };
 
-  onProgress?.("Depositing USDC into Cloak...");
+  onProgress?.("Withdrawing from your account...");
   const deposited = await transact(
     {
       inputUtxos: [await createZeroUtxo(mint)],
@@ -114,7 +105,7 @@ export async function sendPrivateUsdcPayment({
 
   console.log('deposit successful', deposited)
 
-  onProgress?.("Withdrawing privately to merchant...");
+  onProgress?.("Transfering privately to merchant...");
   const withdrawn = await fullWithdraw(deposited.outputUtxos, merchant, {
     ...cloakOptions,
     addressLookupTableAccounts: deposited.addressLookupTableAccounts,

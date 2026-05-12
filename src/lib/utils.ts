@@ -75,7 +75,7 @@ export function getPaymentErrorDetails(error: unknown): CheckoutPaymentError {
       category: "validation",
       title: "Invalid Solana address",
       message:
-        "A Solana address is missing or invalid. Check the receiving wallet and VITE_SOLANA_USDC_MINT configuration.",
+        "A Solana address is missing or invalid. Check the receiving wallet and SOLANA_USDC_MINT configuration.",
       recoverable: false,
     };
   }

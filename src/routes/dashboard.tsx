@@ -11,6 +11,7 @@ import {
   LoaderCircle,
   Pencil,
   Plus,
+  QrCode,
   ReceiptText,
   Save,
   Trash2,
@@ -33,6 +34,15 @@ import {
   saveSubscriptionPage,
   subscriptionPagesQueryKey,
 } from "../lib/subscriptionPage";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { QRCodeGenerator } from "@/components/QRCodeGenerator";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardRoute,
@@ -653,6 +663,41 @@ function ProjectDetails({
             value={publicUrl}
             title="Copy public URL"
           />
+          <div className="bg-white rounded-lg border border-slate-200 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <QrCode size={16} aria-hidden="true"/>
+                <span className="text-sm font-medium text-slate-900">QR Code</span>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <QrCode size={14} aria-hidden="true" className="mr-2" />
+                    Generate QR Code
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md bg-white">
+                  <DialogHeader>
+                    <DialogTitle>QR Code for {page.businessName}</DialogTitle>
+                    <DialogDescription>
+                      Scan this QR code to access the checkout page directly.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex justify-center py-4">
+                    <QRCodeGenerator value={publicUrl} size={200} />
+                  </div>
+                  <div className="flex justify-center">
+                    <p className="text-xs text-slate-500 text-center max-w-xs">
+                      {publicUrl}
+                    </p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <p className="text-xs text-slate-600">
+              Generate a QR code for customers to scan and access your checkout page directly.
+            </p>
+          </div>
           <CopyRow
             className="bg-white"
             icon={<Wallet size={16} aria-hidden="true" />}

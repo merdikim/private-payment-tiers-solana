@@ -55,8 +55,7 @@ Without Cloak, all USDC transfers would be visible on-chain. With Cloak:
 
 ### For Merchants
 ✅ **Create Custom Checkout Pages** - No coding required; build beautiful tiered payment pages in minutes  
-✅ **Share Public Payment Links or QR code** - Generate a simple link and share with customers instantly  
-✅ **Manage All Payments** - Dashboard to track confirmed payments, customer details, and payment history  
+✅ **Share Public Payment Links or QR code** - Generate a simple link and share with customers instantly  ✅ **Generate QR Codes** - Create scannable QR codes for direct access to checkout pages  ✅ **Manage All Payments** - Dashboard to track confirmed payments, customer details, and payment history  
 ✅ **Branding & Customization** - Add your logo, choose accent colors, customize headlines  
 ✅ **Tiered Pricing Flexibility** - Create multiple service tiers (Consultation, Custom Project, etc.)  
 
@@ -87,9 +86,6 @@ Create a `.env.local` file in the project root:
 ```env
 # Solana RPC Configuration
 VITE_SOLANA_RPC_URL=https://api.mainnet.solana.com
-
-# USDC Mint Address (default: mainnet USDC)
-VITE_SOLANA_USDC_MINT=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
 
 # Database
 DATABASE_URL=postgresql://user:password@localhost:5432/delta_pay
@@ -198,6 +194,14 @@ prisma/
 - Funds move through Cloak's privacy pool
 - Merchant receives USDC to their Solana wallet
 - Payment status updates in real-time
+
+### QR Code Generation
+
+Merchants can generate QR codes directly from their dashboard:
+- Click "Generate QR Code" button next to the checkout page URL
+- QR code modal displays with scannable code
+- Customers can scan to access checkout page instantly
+- Perfect for physical marketing materials, business cards, or in-person demos
 
 ### Under the Hood: The Cloak Protocol
 
